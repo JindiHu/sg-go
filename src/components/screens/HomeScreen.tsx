@@ -35,7 +35,6 @@ export const HomeScreen: FC<StackScreenProps<RouteStackParamList, 'Route'>> = ({
       setAddresses([]);
     }
   }, [debouncedSearchQuery]);
-  console.log(addresses);
 
   return (
     <ScrollView style={{}}>

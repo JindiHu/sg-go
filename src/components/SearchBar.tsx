@@ -23,6 +23,7 @@ export const SearchBar: FC<SearchBar> = ({onChangeText, placeholder}) => {
         placeholder={placeholder}
         style={styles.input}
         placeholderTextColor={colors.gray}
+        autoFocus={true}
         onChangeText={onChangeText}
         keyboardType="default"
       />

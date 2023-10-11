@@ -56,11 +56,29 @@ class TourismHubService {
       'historical',
       'art',
       'chinese',
-      'beach',
+      'Brand shop',
+      'Category shop',
+      'Boutique',
+      'Local Product',
+      'Antique shop',
+      'Thrift store',
+      'City/Neighborhood shopping',
+      'Shopping Center/Mall directory',
+      'Seasonal sale',
+      'Online shop',
+      'Art gallery',
+      'Craft store',
+      'Bookstore',
+      'Vintage clothing store',
+      'Home goods store',
+      'Pet store',
+      'Beauty supply store',
+      'Computer store',
+      'Sports store',
     ];
     const randomIndex = Math.floor(Math.random() * possibleSearchValues.length);
     const randomSearchValue = possibleSearchValues[randomIndex];
-    console.log(randomSearchValue);
+
     const res = await this.instance.get<{data: Shop[]}>(
       '/content/shops/v2/search',
       {

@@ -1,26 +1,28 @@
-import {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 import {FC} from 'react';
+import {SearchScreen} from '../screens/SearchScreen';
 import {BottomTab} from './BottomTab';
-import {ProfileScreen} from '../screens/ProfileScreen';
 
-export type RootStackParamList = {
+export type ParamList = {
   BottomTab: undefined;
-  Search: undefined;
+  SearchAddress: {type: 'origin' | 'destination'};
+  Route: undefined;
+  Profile: undefined;
 };
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<ParamList>();
 
 export const RootStack: FC = () => {
   return (
     <Stack.Navigator
       initialRouteName="BottomTab"
       screenOptions={{
-        presentation: 'modal',
         headerShown: false,
         animationEnabled: true,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
       }}>
       <Stack.Screen name="BottomTab" component={BottomTab} options={{}} />
-      <Stack.Screen name="SearchAddress" component={ProfileScreen} />
+      <Stack.Screen name="SearchAddress" component={SearchScreen} />
     </Stack.Navigator>
   );
 };

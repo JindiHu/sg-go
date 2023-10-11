@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {handleApiError} from '../services/error';
 import {Shop, tourismHubService} from '../services/tourismHub';
+import {colors} from '../constants';
 
 const ShopCard: FC<Shop> = props => {
   const [thumbnail, setThumbnail] = useState<string>();
@@ -35,9 +36,7 @@ const ShopCard: FC<Shop> = props => {
 
   return (
     <View style={styles.shopItem}>
-      {thumbnail && (
-        <Image source={{uri: thumbnail}} style={styles.thumbnail} />
-      )}
+      <Image source={{uri: thumbnail}} style={styles.thumbnail} />
       <View style={styles.shopInfo}>
         <Text style={styles.shopName}>{props.name}</Text>
       </View>
@@ -53,10 +52,19 @@ export const ShopList: FC = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const fetchData = async () => {
-    console.log('fetching data');
     try {
       const data = await tourismHubService.getShops();
-      setShops(data);
+
+      setShops(
+        data.filter(shop => {
+          if (shop.thumbnails.length > 0) {
+            if (shop.thumbnails[0].url || shop.thumbnails[0].uuid) {
+              return true;
+            }
+          }
+          return false;
+        }),
+      );
     } catch (error) {
       setShops([]);
       handleApiError('tourismHub', error);
@@ -79,23 +87,15 @@ export const ShopList: FC = () => {
       data={shops}
       keyExtractor={shop => shop.uuid}
       renderItem={renderShopItem}
+      refreshing={isRefreshing}
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={onRefresh}
-          colors={['#3498db']} // Customize the refresh indicator color(s)
-          tintColor={'#3498db'} // iOS only: Customize the spinning indicator color
+          colors={[colors.gray]} // Customize the refresh indicator color(s)
+          tintColor={colors.gray} // iOS only: Customize the spinning indicator color
           title={'Pull to Refresh'} // iOS only: Text shown while pulling down to refresh
         />
-      }
-      ListFooterComponent={
-        isRefreshing ? (
-          <ActivityIndicator
-            size="large"
-            color="#3498db"
-            style={styles.loadingIndicator}
-          />
-        ) : null
       }
     />
   );

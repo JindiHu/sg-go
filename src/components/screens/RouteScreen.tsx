@@ -5,27 +5,28 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {StackScreenProps} from '@react-navigation/stack';
-import {FC, useEffect} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {FC} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {colors, sizes} from '../../constants';
-import {handleApiError} from '../../services/error';
-import {tourismHubService} from '../../services/tourismHub';
 import {Card} from '../Card/Card';
-import {Header} from '../Header';
-import {RouteStackParamList} from '../navigations/RouteStack';
+import {Header} from '../Header/Header';
 import {ShopList} from '../ShopList';
+import {ParamList} from '../navigations/RootStack';
 
-export const RouteScreen: FC<
-  StackScreenProps<RouteStackParamList, 'Route'>
-> = ({route, navigation}) => {
+export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
+  route,
+  navigation,
+}) => {
   const headerHeight = sizes.xxxlg + sizes.md * 2 + sizes.md / 2;
 
   const handleOnPressOrigin = () => {
-    console.log('open modal');
+    navigation.navigate('SearchAddress', {type: 'origin'});
   };
 
-  const handleOnPressDestination = () => {};
+  const handleOnPressDestination = () => {
+    navigation.navigate('SearchAddress', {type: 'destination'});
+  };
   return (
     <View style={styles.container}>
       <Header route={route} navigation={navigation} height={headerHeight} />
@@ -51,7 +52,7 @@ export const RouteScreen: FC<
           <TouchableWithoutFeedback
             onPress={handleOnPressOrigin}
             style={[styles.searchBar, {marginBottom: sizes.md}]}>
-            <Text style={styles.searchBarText}>Choose tarting point</Text>
+            <Text style={styles.searchBarText}>Choose starting point</Text>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={handleOnPressDestination}
@@ -61,9 +62,6 @@ export const RouteScreen: FC<
         </View>
       </Card>
       <ShopList />
-      {/* <ScrollView>
-        <Text>Home Screen</Text>
-      </ScrollView> */}
     </View>
   );
 };
