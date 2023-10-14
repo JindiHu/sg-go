@@ -21,6 +21,7 @@ import {ParamList} from '../navigations/RootStack';
 import {Header} from '../Header/Header';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft, faSearch} from '@fortawesome/free-solid-svg-icons';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
   route,
@@ -122,18 +123,22 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
 const renderFirstItem = ({type}: {type: 'origin' | 'destination'}) => {
   if (type == 'origin') {
     return (
-      <View>
-        <Text>Current localtion</Text>
-      </View>
+      <TouchableOpacity>
+        <View style={styles.row}>
+          <Text style={styles.rowText}>Current localtion</Text>
+        </View>
+      </TouchableOpacity>
     );
   }
 };
 
 const renderAddress: ListRenderItem<Address> = ({item}) => {
   return (
-    <View>
-      <Text>{item.ADDRESS}</Text>
-    </View>
+    <TouchableOpacity>
+      <View style={styles.row}>
+        <Text style={styles.rowText}>{item.ADDRESS}</Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -167,6 +172,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: sizes.xxlg,
+    color: colors.dark,
+  },
+  row: {
+    paddingHorizontal: sizes.md,
+    paddingVertical: sizes.sm,
+  },
+  rowText: {
+    fontSize: sizes.md,
     color: colors.dark,
   },
 });
