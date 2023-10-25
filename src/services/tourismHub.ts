@@ -90,7 +90,6 @@ class TourismHubService {
     );
 
     const shops = res.data.data;
-
     return shops;
   };
 

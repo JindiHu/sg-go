@@ -9,9 +9,17 @@ export const setOrigin = (
   dispatch({type: SET_ORIGIN, payload});
 };
 
+export const unsetOrigin = (dispatch: Dispatch<RouteAction>) => {
+  dispatch({type: SET_ORIGIN, payload: undefined});
+};
+
 export const setDestination = (
   dispatch: Dispatch<RouteAction>,
   payload: RouteState['destination'],
 ) => {
   dispatch({type: SET_DESTINATION, payload});
+};
+
+export const unsetDestination = (dispatch: Dispatch<RouteAction>) => {
+  dispatch({type: SET_DESTINATION, payload: undefined});
 };

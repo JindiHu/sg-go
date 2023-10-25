@@ -22,22 +22,43 @@ import {Header} from '../Header/Header';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft, faSearch} from '@fortawesome/free-solid-svg-icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {useAppContext} from '../../context/AppContext';
+import {
+  setDestination,
+  setOrigin,
+  unsetDestination,
+  unsetOrigin,
+} from '../../context/reducers/route/route.actions';
 
 export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
   route,
   navigation,
 }) => {
   const {type} = route.params;
+
+  const {state, dispatch} = useAppContext();
+  const defaultOriginString = state.route.origin?.ADDRESS || '';
+  const defaultDestinationString = state.route.destination?.ADDRESS || '';
+  const defaultSearchString =
+    type == 'origin' ? defaultOriginString : defaultDestinationString;
+
   const placeholder =
     type == 'origin' ? 'Choose starting point' : 'Choose destination';
 
-  const [searchQuery, setSearchQuery] = useState<string>();
+  const [searchQuery, setSearchQuery] = useState<string>(defaultSearchString);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const debouncedSearchQuery = useDebounce(searchQuery, 1000);
 
   const onChangeText = async (text: string) => {
     setSearchQuery(text);
+    if (!text) {
+      if (type == 'origin') {
+        unsetOrigin(dispatch);
+      } else {
+        unsetDestination(dispatch);
+      }
+    }
   };
 
   const doSearch = async (query: string) => {
@@ -67,6 +88,37 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
     }
   };
 
+  const renderFirstItem = ({type}: {type: 'origin' | 'destination'}) => {
+    if (type == 'origin') {
+      return (
+        <TouchableOpacity>
+          <View style={styles.row}>
+            <Text style={styles.rowText}>Current localtion</Text>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+  };
+
+  const renderAddress: ListRenderItem<Address> = ({item}) => {
+    const handlePress = () => {
+      if (type == 'origin') {
+        setOrigin(dispatch, item);
+      } else {
+        setDestination(dispatch, item);
+      }
+      navigation.goBack();
+    };
+
+    return (
+      <TouchableOpacity onPress={handlePress}>
+        <View style={styles.row}>
+          <Text style={styles.rowText}>{item.ADDRESS}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Header route={route} navigation={navigation} height={sizes.x4xlg} />
@@ -94,8 +146,10 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
             placeholder={placeholder}
             style={styles.input}
             placeholderTextColor={colors.gray}
-            autoFocus={true}
+            autoFocus={!searchQuery}
+            clearButtonMode={'always'}
             onChangeText={onChangeText}
+            value={searchQuery}
             keyboardType="default"
           />
         </View>
@@ -117,28 +171,6 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
         }
       />
     </View>
-  );
-};
-
-const renderFirstItem = ({type}: {type: 'origin' | 'destination'}) => {
-  if (type == 'origin') {
-    return (
-      <TouchableOpacity>
-        <View style={styles.row}>
-          <Text style={styles.rowText}>Current localtion</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  }
-};
-
-const renderAddress: ListRenderItem<Address> = ({item}) => {
-  return (
-    <TouchableOpacity>
-      <View style={styles.row}>
-        <Text style={styles.rowText}>{item.ADDRESS}</Text>
-      </View>
-    </TouchableOpacity>
   );
 };
 

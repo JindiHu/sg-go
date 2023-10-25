@@ -11,6 +11,7 @@ export class ServiceError extends Error {
 
 export const handleApiError = (service: string, error: unknown) => {
   if (axios.isAxiosError(error)) {
+    console.error(error);
     throw new ServiceError(
       `[${service}] ${error.code} ${error.message}`,
       error.status || StatusCodes.INTERNAL_SERVER_ERROR,

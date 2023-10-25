@@ -9,8 +9,10 @@ import {FC} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {colors, sizes} from '../../constants';
+import {useAppContext} from '../../context/AppContext';
 import {Card} from '../Card/Card';
 import {Header} from '../Header/Header';
+import {RoutePlanList} from '../RoutePlanList';
 import {ShopList} from '../ShopList';
 import {ParamList} from '../navigations/RootStack';
 
@@ -18,6 +20,8 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
   route,
   navigation,
 }) => {
+  const {state} = useAppContext();
+
   const headerHeight = sizes.xxxlg + sizes.md * 2 + sizes.md / 2;
 
   const handleOnPressOrigin = () => {
@@ -27,6 +31,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
   const handleOnPressDestination = () => {
     navigation.navigate('SearchAddress', {type: 'destination'});
   };
+
   return (
     <View style={styles.container}>
       <Header route={route} navigation={navigation} height={headerHeight} />
@@ -52,16 +57,41 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
           <TouchableWithoutFeedback
             onPress={handleOnPressOrigin}
             style={[styles.searchBar, {marginBottom: sizes.md}]}>
-            <Text style={styles.searchBarText}>Choose starting point</Text>
+            {state.route.origin ? (
+              <Text style={styles.searchBarText} numberOfLines={1}>
+                {state.route.origin.ADDRESS}
+              </Text>
+            ) : (
+              <Text style={styles.searchBarText}>Choose starting point</Text>
+            )}
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={handleOnPressDestination}
             style={styles.searchBar}>
-            <Text style={styles.searchBarText}>Choose destination</Text>
+            {state.route.destination ? (
+              <Text style={styles.searchBarText} numberOfLines={1}>
+                {state.route.destination.ADDRESS}
+              </Text>
+            ) : (
+              <Text style={styles.searchBarText}>Choose destination</Text>
+            )}
           </TouchableWithoutFeedback>
         </View>
       </Card>
-      <ShopList />
+      {state.route.origin && state.route.destination ? (
+        <RoutePlanList
+          start={{
+            latitude: state.route.origin.LATITUDE,
+            longitude: state.route.origin.LONGITUDE,
+          }}
+          end={{
+            latitude: state.route.destination.LATITUDE,
+            longitude: state.route.destination.LONGITUDE,
+          }}
+        />
+      ) : (
+        <ShopList />
+      )}
     </View>
   );
 };
