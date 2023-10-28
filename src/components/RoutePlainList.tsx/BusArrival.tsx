@@ -1,0 +1,162 @@
+import moment from 'moment';
+import {FC, useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import {colors, sizes} from '../../constants';
+import {handleApiError} from '../../services/error';
+import {ltaService} from '../../services/lta';
+
+type BusArrivalProps = {
+  busStopCode: string;
+  serviceNo: string;
+};
+
+const displayCrowdingLevel = (crowdingLevel: string) => {
+  switch (crowdingLevel) {
+    case 'SEA':
+      return 'Seats Avail';
+    case 'SDA':
+      return 'Standing Avail';
+    case 'LSD':
+      return 'Ltd Standing';
+    default:
+      return '';
+  }
+};
+
+export const BusArrival: FC<BusArrivalProps> = ({busStopCode, serviceNo}) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [durationInMin, setDurationInMin] = useState<number | null>();
+  const [crowdingLevel, setCrowdingLevel] = useState<string | null>();
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const busArrival = await ltaService.getBusArrival(busStopCode, serviceNo);
+      if (busArrival.Services.length > 0) {
+        const arrival = parseInt(
+          moment(busArrival.Services[0].NextBus.EstimatedArrival).format('X'),
+        );
+        const now = parseInt(moment().format('X'));
+        const def = arrival - now;
+        if (def > 0) {
+          setDurationInMin(Math.ceil(def / 60));
+          setCrowdingLevel(busArrival.Services[0].NextBus.Load);
+        } else {
+          const arrival = parseInt(
+            moment(busArrival.Services[0].NextBus2.EstimatedArrival).format(
+              'X',
+            ),
+          );
+          const now = parseInt(moment().format('X'));
+          const def = arrival - now;
+          if (def > 0) {
+            setDurationInMin(Math.ceil(def / 60));
+            setCrowdingLevel(busArrival.Services[0].NextBus2.Load);
+          } else {
+            const arrival = parseInt(
+              moment(busArrival.Services[0].NextBus3.EstimatedArrival).format(
+                'X',
+              ),
+            );
+            const now = parseInt(moment().format('X'));
+            const def = arrival - now;
+            if (def > 0) {
+              setDurationInMin(Math.ceil(def / 60));
+              setCrowdingLevel(busArrival.Services[0].NextBus3.Load);
+            } else {
+              setDurationInMin(null);
+              setCrowdingLevel('');
+            }
+          }
+        }
+      } else {
+        setDurationInMin(null);
+        setCrowdingLevel('');
+      }
+    } catch (error) {
+      setDurationInMin(null);
+      setCrowdingLevel('');
+      handleApiError('lta', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [busStopCode, serviceNo]);
+
+  const handlePress = () => {
+    fetchData();
+  };
+  return (
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={handlePress}>
+        <View style={[styles.busArrivalContainer]}>
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <>
+              <View>
+                {durationInMin ? (
+                  <>
+                    <View>
+                      <Text style={styles.busArrivalText}>{durationInMin}</Text>
+                    </View>
+                    <View>
+                      <Text style={styles.busArrivalTextUnit}>min</Text>
+                    </View>
+                  </>
+                ) : (
+                  <Text style={styles.busArrivalText}>NA</Text>
+                )}
+              </View>
+            </>
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+      {crowdingLevel && (
+        <View style={styles.crowdingLevel}>
+          <Text style={styles.crowdingLevelText}>
+            {displayCrowdingLevel(crowdingLevel)}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'flex-end',
+  },
+  busArrivalContainer: {
+    width: sizes.xxlg,
+    height: sizes.xxlg,
+    backgroundColor: colors.dark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: sizes.xs,
+  },
+  busArrivalText: {
+    fontWeight: '600',
+    textAlign: 'center',
+    color: colors.white,
+  },
+  busArrivalTextUnit: {
+    color: colors.white,
+    fontSize: sizes.sm,
+  },
+  crowdingLevel: {
+    marginTop: sizes.xs,
+  },
+  crowdingLevelText: {
+    fontSize: sizes.sm,
+  },
+});

@@ -30,8 +30,18 @@ export const sizes = {
   x6xlg: size * 6,
 };
 
-export const fontWeight = {
-  normal: '400',
-  bold: '600',
-  bolder: '700',
+export const transportColors: {mrt: Record<string, string>; bus: string} = {
+  mrt: {
+    NS: '#e32d2c',
+    EW: '#00964d',
+    CG: '#00964d',
+    NE: '#8f4199',
+    CC: '#f99d25',
+    DT: '#005da8',
+    TE: '#9d5b25',
+    BP: '#718573',
+    SK: '#718573',
+    PG: '#718573',
+  },
+  bus: '#94c83d',
 };

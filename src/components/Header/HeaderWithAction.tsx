@@ -19,7 +19,6 @@ export const HeaderWithActions: FC<HeaderWithActionsProps> = ({
         <TouchableWithoutFeedback
           style={styles.leftButton}
           onPress={() => {
-            console.log('back');
             navigation.goBack();
           }}>
           <FontAwesomeIcon

@@ -12,7 +12,7 @@ import {colors, sizes} from '../../constants';
 import {useAppContext} from '../../context/AppContext';
 import {Card} from '../Card/Card';
 import {Header} from '../Header/Header';
-import {RoutePlanList} from '../RoutePlanList';
+import {RoutePlanList} from '../RoutePlainList.tsx/RoutePlanList';
 import {ShopList} from '../ShopList';
 import {ParamList} from '../navigations/RootStack';
 

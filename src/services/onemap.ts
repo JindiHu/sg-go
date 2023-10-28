@@ -42,7 +42,7 @@ export type RoutePlanParams = {
   end: Location;
 };
 
-type RoutePlanLocaltion = {
+export type RoutePlanLocaltion = {
   name: string;
   lat: number;
   lon: number;
@@ -56,7 +56,7 @@ type RoutePlanLocaltion = {
   stopSequence: number;
 };
 
-type Leg = {
+export type Leg = {
   duration: number;
   startTime: number;
   endTime: number;
@@ -65,10 +65,14 @@ type Leg = {
   realTime: boolean;
   distance: number;
   pathway: boolean;
-  mode: 'WALK' | 'SUBWAY' | 'BUS';
+  mode: 'WALK' | 'SUBWAY' | 'TRAM' | 'BUS';
+  routeId: string;
   route: string;
+  routeShortName: string;
+  routeLongName: string;
   agencyName?: string;
   numIntermediateStops: number;
+  intermediateStops: RoutePlanLocaltion[];
   from: RoutePlanLocaltion;
   to: RoutePlanLocaltion;
 };
@@ -150,6 +154,31 @@ class OnemapService {
         numItineraries: 3,
       },
       headers: authHeaders,
+    });
+
+    const routes = res.data;
+    routes.plan.itineraries.forEach(itinerary => {
+      if (itinerary.legs.length > 0) {
+        let prevLeg: Leg;
+        const legs: Leg[] = [];
+        itinerary.legs.forEach((leg, index) => {
+          if (index > 0) {
+            if (leg.mode === 'WALK' && prevLeg.mode === 'WALK') {
+              legs[legs.length - 1].to = leg.to;
+              legs[legs.length - 1].duration =
+                legs[legs.length - 1].duration + leg.duration;
+              legs[legs.length - 1].endTime = leg.endTime;
+            } else {
+              legs.push(leg);
+            }
+          } else {
+            legs.push(leg);
+          }
+          prevLeg = leg;
+        });
+
+        itinerary.legs = legs;
+      }
     });
 
     return res.data;

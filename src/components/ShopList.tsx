@@ -1,6 +1,5 @@
 import {FC, useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ListRenderItem,
@@ -9,9 +8,9 @@ import {
   Text,
   View,
 } from 'react-native';
+import {colors} from '../constants';
 import {handleApiError} from '../services/error';
 import {Shop, tourismHubService} from '../services/tourismHub';
-import {colors} from '../constants';
 
 const ShopCard: FC<Shop> = props => {
   const [thumbnail, setThumbnail] = useState<string>();
@@ -53,6 +52,7 @@ export const ShopList: FC = () => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const fetchData = async () => {
     try {
+      setIsRefreshing(true);
       const data = await tourismHubService.getShops();
 
       setShops(
@@ -78,7 +78,6 @@ export const ShopList: FC = () => {
   }, []);
 
   const onRefresh = () => {
-    setIsRefreshing(true);
     fetchData(); // Fetch data when the user pulls down to refresh
   };
 
