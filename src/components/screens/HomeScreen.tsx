@@ -1,16 +1,20 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import {FC, useEffect, useState} from 'react';
-import {Button, StyleSheet, Text, TextInput} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {colors, sizes} from '../../constants';
+import {StyleSheet, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useDebounce} from '../../hooks/useDebounce';
 import {handleApiError} from '../../services/error';
 import {Address, onemapService} from '../../services/onemap';
-import {RouteStackParamList} from '../navigations/RouteStack';
+import {tourismHubService} from '../../services/tourismHub';
+import {Header} from '../Header/Header';
+import {PlaceList} from '../PlaceList';
+import {ParamList} from '../navigations/RootStack';
 
-export const HomeScreen: FC<StackScreenProps<RouteStackParamList, 'Route'>> = ({
+export const HomeScreen: FC<StackScreenProps<ParamList, 'Home'>> = ({
+  route,
   navigation,
 }) => {
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState<string>();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const debouncedSearchQuery = useDebounce(searchQuery, 1000);
@@ -25,7 +29,7 @@ export const HomeScreen: FC<StackScreenProps<RouteStackParamList, 'Route'>> = ({
         const data = await onemapService.search(query);
         setAddresses(data.results);
       } catch (error) {
-        handleApiError('Onemap', error);
+        handleApiError(error);
       }
     }
 
@@ -37,30 +41,15 @@ export const HomeScreen: FC<StackScreenProps<RouteStackParamList, 'Route'>> = ({
   }, [debouncedSearchQuery]);
 
   return (
-    <ScrollView style={{}}>
-      <TextInput
-        style={styles.input}
-        onChangeText={onChange}
-        value={searchQuery}
-        placeholder="useless placeholder"
-        keyboardType="default"
-      />
-      <Text>Home Screen</Text>
-      <Button
-        title="Go to Profile"
-        onPress={() => navigation.navigate('Profile')}
-      />
-    </ScrollView>
+    <View style={styles.container}>
+      <Header route={route} navigation={navigation} />
+      <PlaceList fetchData={tourismHubService.getAttriactions} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  input: {
-    margin: sizes.sm,
-    borderWidth: 1,
-    borderRadius: sizes.xxs,
-    borderColor: colors.gray,
-    padding: sizes.sm,
-    fontSize: sizes.md,
+  container: {
+    flex: 1,
   },
 });

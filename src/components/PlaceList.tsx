@@ -1,9 +1,9 @@
 import {FC, useEffect, useState} from 'react';
 import {Image, ListRenderItem, StyleSheet, Text, View} from 'react-native';
-import {Shop, tourismHubService} from '../services/tourismHub';
+import {Place, tourismHubService} from '../services/tourismHub';
 import {FetchableFlatList} from './FetchableFlatList';
 
-const ShopCard: FC<Shop> = props => {
+const PlaceCard: FC<Place> = props => {
   const [thumbnail, setThumbnail] = useState<string>();
 
   const fetchImage = async () => {
@@ -25,26 +25,30 @@ const ShopCard: FC<Shop> = props => {
   }, []);
 
   return (
-    <View style={styles.shopItem}>
+    <View style={styles.placeItem}>
       <Image source={{uri: thumbnail}} style={styles.thumbnail} />
-      <View style={styles.shopInfo}>
-        <Text style={styles.shopName}>{props.name}</Text>
+      <View style={styles.placeInfo}>
+        <Text style={styles.placeName}>{props.name}</Text>
       </View>
     </View>
   );
 };
 
-const renderShopItem: ListRenderItem<Shop> = ({item}) => {
-  return <ShopCard {...item} />;
+const renderPlaceItem: ListRenderItem<Place> = ({item}) => {
+  return <PlaceCard {...item} />;
 };
 
-export const ShopList: FC = () => {
-  const fetchData = async () => {
-    const data = await tourismHubService.getShops();
+type PlaceListProps = {
+  fetchData: () => Promise<Place[]>;
+};
 
-    return data.filter(shop => {
-      if (shop.thumbnails.length > 0) {
-        if (shop.thumbnails[0].url || shop.thumbnails[0].uuid) {
+export const PlaceList: FC<PlaceListProps> = ({fetchData}) => {
+  const doFetch = async () => {
+    const data = await fetchData();
+
+    return data.filter(place => {
+      if (place.thumbnails.length > 0) {
+        if (place.thumbnails[0].url || place.thumbnails[0].uuid) {
           return true;
         }
       }
@@ -53,24 +57,20 @@ export const ShopList: FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    doFetch();
   }, []);
-
-  const onRefresh = () => {
-    fetchData(); // Fetch data when the user pulls down to refresh
-  };
 
   return (
     <FetchableFlatList
-      fetchData={fetchData}
-      keyExtractor={shop => shop.uuid}
-      renderItem={renderShopItem}
+      fetchData={doFetch}
+      keyExtractor={place => place.uuid}
+      renderItem={renderPlaceItem}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  shopItem: {
+  placeItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
@@ -83,16 +83,12 @@ const styles = StyleSheet.create({
     marginRight: 16,
     borderRadius: 4,
   },
-  shopInfo: {
+  placeInfo: {
     flex: 1,
   },
-  shopName: {
+  placeName: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  shopDescription: {
-    fontSize: 14,
-    color: '#666',
   },
   loadingIndicator: {
     marginTop: 10,

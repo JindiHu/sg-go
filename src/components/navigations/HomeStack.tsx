@@ -32,15 +32,14 @@ const forFade = ({current, next}: StackHeaderInterpolationProps) => {
 };
 
 export type HomeStackParamList = {
-  Search: undefined;
-  Profile: undefined;
+  Home: undefined;
 };
 const Stack = createStackNavigator<HomeStackParamList>();
 
 export const HomeStack: FC = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Search"
+      initialRouteName="Home"
       screenOptions={{
         headerMode: 'float',
         headerShown: false,
@@ -50,13 +49,12 @@ export const HomeStack: FC = () => {
         headerStyleInterpolator: forFade,
       }}>
       <Stack.Screen
-        name="Search"
-        component={ProfileScreen}
+        name="Home"
+        component={HomeScreen}
         options={{
           title: 'Awesome app',
         }}
       />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 };

@@ -1,4 +1,4 @@
-import {Dispatch, useEffect, useReducer} from 'react';
+import {Dispatch, useEffect, useReducer, useState} from 'react';
 import {AppAction, AppState, rootReducer} from './reducers/rootReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -41,6 +41,8 @@ export const usePersistReducer = (
 ): [AppState, Dispatch<AppAction>] => {
   let persistState = appState;
 
+  const [isLoadingFromStorage, setIsLoadingFromStorage] = useState(true);
+
   useEffect(() => {
     const rehydrate = async () => {
       try {
@@ -59,7 +61,7 @@ export const usePersistReducer = (
               );
               if (valueFromAsyncStorage) {
                 setValue(
-                  clonedState,
+                  persistState,
                   keysStr.split('.'),
                   valueFromAsyncStorage,
                 );
@@ -67,10 +69,10 @@ export const usePersistReducer = (
             } catch (e) {}
           });
         }
-
-        persistState = clonedState;
-      } catch (e) {
+      } catch (_) {
         persistState = appState;
+      } finally {
+        setIsLoadingFromStorage(false);
       }
     };
 
@@ -80,7 +82,11 @@ export const usePersistReducer = (
   const [state, dispatch] = useReducer(reducer, persistState);
 
   useEffect(() => {
-    if (config.whitelist && config.whitelist.length > 0) {
+    if (
+      config.whitelist &&
+      config.whitelist.length > 0 &&
+      !isLoadingFromStorage
+    ) {
       const whitelistState = {};
       config.whitelist.forEach(keysStr => {
         try {
@@ -93,7 +99,7 @@ export const usePersistReducer = (
       });
       AsyncStorage.setItem(config.key, JSON.stringify(whitelistState));
     }
-  }, [state]);
+  }, [state, isLoadingFromStorage]);
 
   return [state, dispatch];
 };

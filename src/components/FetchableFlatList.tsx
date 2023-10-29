@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {colors, sizes} from '../constants';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {handleApiError} from '../services/error';
 
 type FetchableFlatListProps<ItemT = any> = FC<
   Omit<FlatListProps<ItemT>, 'data'> & {
@@ -37,6 +38,7 @@ export const FetchableFlatList: FetchableFlatListProps = ({
       setHasError(false);
     } catch (e) {
       setHasError(true);
+      handleApiError(e);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

@@ -10,10 +10,11 @@ import {StyleSheet, Text, View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {colors, sizes} from '../../constants';
 import {useAppContext} from '../../context/AppContext';
+import {tourismHubService} from '../../services/tourismHub';
 import {Card} from '../Card/Card';
 import {Header} from '../Header/Header';
+import {PlaceList} from '../PlaceList';
 import {RoutePlanList} from '../RoutePlainList.tsx/RoutePlanList';
-import {ShopList} from '../ShopList';
 import {ParamList} from '../navigations/RootStack';
 
 export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
@@ -90,7 +91,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
           }}
         />
       ) : (
-        <ShopList />
+        <PlaceList fetchData={tourismHubService.getShops} />
       )}
     </View>
   );

@@ -19,6 +19,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {colors, sizes} from '../../constants';
 import {useAppContext} from '../../context/AppContext';
 import {
+  pushRecentSearch,
   setDestination,
   setOrigin,
   unsetDestination,
@@ -118,6 +119,7 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
       } else {
         setDestination(dispatch, item);
       }
+      pushRecentSearch(dispatch, item);
       navigation.goBack();
     };
 

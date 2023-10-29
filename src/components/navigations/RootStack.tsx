@@ -7,7 +7,7 @@ export type ParamList = {
   BottomTab: undefined;
   SearchAddress: {type: 'origin' | 'destination'};
   Route: undefined;
-  Profile: undefined;
+  Home: undefined;
 };
 
 const Stack = createStackNavigator<ParamList>();

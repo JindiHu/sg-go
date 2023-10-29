@@ -9,10 +9,10 @@ import {ParamListBase, Route} from '@react-navigation/native';
 export type HeaderProps = {
   route: Route<string>;
   navigation: StackNavigationProp<ParamListBase>;
-  height: number;
+  height?: number;
 };
 
-export const Header: FC<HeaderProps> = ({height}) => {
+export const Header: FC<HeaderProps> = ({height = 0}) => {
   const insets = useSafeAreaInsets();
 
   return (

@@ -7,7 +7,7 @@ type Thumbnail = {
   url: string;
 };
 
-export type Shop = {
+export type Place = {
   uuid: string;
   name: string;
   rating: string;
@@ -41,7 +41,29 @@ class TourismHubService {
     });
   }
 
-  public getShops = async (): Promise<Shop[]> => {
+  public getMedia = async (uuid: string): Promise<string> => {
+    const res = await this.instance.get<Blob>(`/media/download/v2/${uuid}`, {
+      responseType: 'blob',
+    });
+    const blob: Blob = res.data;
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String: string | ArrayBuffer | null = reader.result;
+        if (typeof base64String === 'string') {
+          resolve(base64String);
+        } else {
+          reject('Conversion to base64 failed');
+        }
+      };
+      reader.onerror = () => {
+        reject('FileReader error');
+      };
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  public getShops = async (): Promise<Place[]> => {
     const possibleSearchValues = [
       'shopping',
       'central',
@@ -79,7 +101,7 @@ class TourismHubService {
     const randomIndex = Math.floor(Math.random() * possibleSearchValues.length);
     const randomSearchValue = possibleSearchValues[randomIndex];
 
-    const res = await this.instance.get<{data: Shop[]}>(
+    const res = await this.instance.get<{data: Place[]}>(
       '/content/shops/v2/search',
       {
         params: {
@@ -93,26 +115,113 @@ class TourismHubService {
     return shops;
   };
 
-  public getMedia = async (uuid: string): Promise<string> => {
-    const res = await this.instance.get<Blob>(`/media/download/v2/${uuid}`, {
-      responseType: 'blob',
-    });
-    const blob: Blob = res.data;
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64String: string | ArrayBuffer | null = reader.result;
-        if (typeof base64String === 'string') {
-          resolve(base64String);
-        } else {
-          reject('Conversion to base64 failed');
-        }
-      };
-      reader.onerror = () => {
-        reject('FileReader error');
-      };
-      reader.readAsDataURL(blob);
-    });
+  public getAttriactions = async (): Promise<Place[]> => {
+    const possibleSearchValues = [
+      'Full-Day',
+      'Adventure',
+      'Action',
+      'Theme Parks',
+      'Sentosa',
+      'Action Seekers',
+      'Families',
+      'Attractions',
+      'Explorers',
+      'Leisure',
+      'Experiences',
+      'Outdoor Recreation',
+      'Group of People',
+      'Sports',
+      'Sightseeing',
+    ];
+    const randomIndex = Math.floor(Math.random() * possibleSearchValues.length);
+    const randomSearchValue = possibleSearchValues[randomIndex];
+
+    const res = await this.instance.get<{data: Place[]}>(
+      '/content/attractions/v2/search',
+      {
+        params: {
+          searchType: 'keyword',
+          searchValues: randomSearchValue,
+        },
+      },
+    );
+
+    const attractions = res.data.data;
+    return attractions;
+  };
+
+  public getAccommodation = async (): Promise<Place[]> => {
+    const possibleSearchValues = [
+      'Hotels',
+      'Leisure',
+      'Serviced Apartments',
+      'Civic District',
+      'Family-friendly',
+      'Short Stay',
+      'Sentosa',
+      'Couples',
+      'Local Foods',
+      'Activities',
+      'Parties',
+      'Lifestyles',
+      'Heartlands',
+      'Socialisers',
+      'East Coast',
+    ];
+    const randomIndex = Math.floor(Math.random() * possibleSearchValues.length);
+    const randomSearchValue = possibleSearchValues[randomIndex];
+
+    const res = await this.instance.get<{data: Place[]}>(
+      '/content/accommodation/v2/search',
+      {
+        params: {
+          searchType: 'keyword',
+          searchValues: randomSearchValue,
+        },
+      },
+    );
+
+    const attractions = res.data.data;
+    return attractions;
+  };
+
+  public getBarsClubs = async (): Promise<Place[]> => {
+    const possibleSearchValues = [
+      'Clarke Quay',
+      'Nightlife',
+      'Parties',
+      'Corporate Events',
+      'Food & Beverages',
+      'Central',
+      'MICE',
+      'Socialisers',
+      'Families',
+      'Casual Dining',
+      'Social Events',
+      'Unique Dining',
+      'Unique Venues',
+      'Alcohol',
+      'Weddings',
+      'Bars',
+      'Private Functions',
+      'Group of People',
+      'Lifestyles',
+    ];
+    const randomIndex = Math.floor(Math.random() * possibleSearchValues.length);
+    const randomSearchValue = possibleSearchValues[randomIndex];
+
+    const res = await this.instance.get<{data: Place[]}>(
+      '/content/bars-clubs/v2/search',
+      {
+        params: {
+          searchType: 'keyword',
+          searchValues: randomSearchValue,
+        },
+      },
+    );
+
+    const attractions = res.data.data;
+    return attractions;
   };
 }
 

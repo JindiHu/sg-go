@@ -13,7 +13,7 @@ export type RouteState = {
 
 export type RouteAction = {
   type: string;
-  payload: RouteState['origin'] | RouteState['destination'];
+  payload?: Address;
 };
 
 export const initialRouteState = {
@@ -32,7 +32,12 @@ export const routeReducer = (
     case SET_DESTINATION:
       return {...state, destination: action.payload};
     case PUSH_RECENT_SEARCHES:
-      return {...state};
+      if (action.payload) {
+        return {
+          ...state,
+          recentSearches: [action.payload, ...state.recentSearches.slice(0, 9)],
+        };
+      }
     default:
       return state;
   }

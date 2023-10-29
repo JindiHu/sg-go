@@ -53,7 +53,7 @@ const IconContainer: FC<
 
 const tabRoutes = [
   {
-    name: 'Home',
+    name: 'HomeStack',
     component: HomeStack,
     tabBarIcon: ({focused, color, size}: IconProps) => (
       <IconContainer focused={focused}>
@@ -86,7 +86,7 @@ export const BottomTab: FC = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeStack"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
