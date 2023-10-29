@@ -59,7 +59,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
             style={[styles.searchBar, {marginBottom: sizes.md}]}>
             {state.route.origin ? (
               <Text style={styles.searchBarText} numberOfLines={1}>
-                {state.route.origin.ADDRESS}
+                {state.route.origin.SEARCHVAL}
               </Text>
             ) : (
               <Text style={styles.searchBarText}>Choose starting point</Text>
@@ -70,7 +70,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
             style={styles.searchBar}>
             {state.route.destination ? (
               <Text style={styles.searchBarText} numberOfLines={1}>
-                {state.route.destination.ADDRESS}
+                {state.route.destination.SEARCHVAL}
               </Text>
             ) : (
               <Text style={styles.searchBarText}>Choose destination</Text>
@@ -123,5 +123,6 @@ const styles = StyleSheet.create({
   },
   searchBarText: {
     color: colors.gray,
+    textTransform: 'capitalize',
   },
 });

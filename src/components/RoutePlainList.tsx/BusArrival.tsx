@@ -19,11 +19,23 @@ type BusArrivalProps = {
 const displayCrowdingLevel = (crowdingLevel: string) => {
   switch (crowdingLevel) {
     case 'SEA':
-      return 'Seats Avail';
+      return (
+        <Text style={[styles.crowdingLevelText, {color: colors.darkGreen}]}>
+          Seats Avail
+        </Text>
+      );
     case 'SDA':
-      return 'Standing Avail';
+      return (
+        <Text style={[styles.crowdingLevelText, {color: colors.yellow}]}>
+          Standing Avail
+        </Text>
+      );
     case 'LSD':
-      return 'Ltd Standing';
+      return (
+        <Text style={[styles.crowdingLevelText, {color: colors.red}]}>
+          Ltd Standing
+        </Text>
+      );
     default:
       return '';
   }
@@ -82,7 +94,7 @@ export const BusArrival: FC<BusArrivalProps> = ({busStopCode, serviceNo}) => {
     } catch (error) {
       setDurationInMin(null);
       setCrowdingLevel('');
-      handleApiError('lta', error);
+      handleApiError(error);
     } finally {
       setIsLoading(false);
     }
@@ -123,9 +135,7 @@ export const BusArrival: FC<BusArrivalProps> = ({busStopCode, serviceNo}) => {
       </TouchableWithoutFeedback>
       {crowdingLevel && (
         <View style={styles.crowdingLevel}>
-          <Text style={styles.crowdingLevelText}>
-            {displayCrowdingLevel(crowdingLevel)}
-          </Text>
+          {displayCrowdingLevel(crowdingLevel)}
         </View>
       )}
     </View>

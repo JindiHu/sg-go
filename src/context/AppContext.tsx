@@ -3,6 +3,7 @@ import {
   ReactNode,
   createContext,
   useContext,
+  useEffect,
   useReducer,
 } from 'react';
 import {
@@ -11,6 +12,7 @@ import {
   initialAppState,
   rootReducer,
 } from './reducers/rootReducer';
+import {usePersistReducer} from './usePersistReducer';
 
 type AppContext = {state: AppState; dispatch: Dispatch<AppAction>};
 export const AppContext = createContext<AppContext | undefined>(undefined);
@@ -22,7 +24,13 @@ export const Provider = ({
   appState?: AppState;
   children: ReactNode;
 }) => {
-  const [state, dispatch] = useReducer(rootReducer, appState);
+  const whitelist = ['route.recentSearches'];
+  const [state, dispatch] = usePersistReducer(
+    {key: 'sg-go', whitelist},
+    rootReducer,
+    appState,
+  );
+
   return (
     <AppContext.Provider value={{state, dispatch}}>
       {children}

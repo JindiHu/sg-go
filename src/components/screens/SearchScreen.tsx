@@ -1,27 +1,22 @@
-import {StackScreenProps} from '@react-navigation/stack';
-import {FC, useEffect, useState} from 'react';
 import {
-  FlatList,
+  faChevronLeft,
+  faLocationArrow,
+  faSearch,
+} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import Geolocation from '@react-native-community/geolocation';
+import {StackScreenProps} from '@react-navigation/stack';
+import React, {FC, useState} from 'react';
+import {
   ListRenderItem,
-  RefreshControl,
   StyleSheet,
+  Text,
   TextInput,
   TouchableWithoutFeedback,
   View,
-  Text,
 } from 'react-native';
-import {colors, sizes} from '../../constants';
-import {useDebounce} from '../../hooks/useDebounce';
-import {handleApiError} from '../../services/error';
-import {Address, onemapService} from '../../services/onemap';
-import {Card} from '../Card/Card';
-import {HeaderWithActions} from '../Header/HeaderWithAction';
-import {SearchBar} from '../SearchBar';
-import {ParamList} from '../navigations/RootStack';
-import {Header} from '../Header/Header';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faChevronLeft, faSearch} from '@fortawesome/free-solid-svg-icons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {colors, sizes} from '../../constants';
 import {useAppContext} from '../../context/AppContext';
 import {
   setDestination,
@@ -29,12 +24,19 @@ import {
   unsetDestination,
   unsetOrigin,
 } from '../../context/reducers/route/route.actions';
+import {useDebounce} from '../../hooks/useDebounce';
+import {Address, onemapService} from '../../services/onemap';
+import {FetchableFlatList} from '../FetchableFlatList';
+import {Header} from '../Header/Header';
+import {ParamList} from '../navigations/RootStack';
 
 export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
   route,
   navigation,
 }) => {
+  const [reloadKey, setReloadKey] = useState<number>(0);
   const {type} = route.params;
+  const inputRef = React.createRef<TextInput>();
 
   const {state, dispatch} = useAppContext();
   const defaultOriginString = state.route.origin?.ADDRESS || '';
@@ -46,11 +48,9 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
     type == 'origin' ? 'Choose starting point' : 'Choose destination';
 
   const [searchQuery, setSearchQuery] = useState<string>(defaultSearchString);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [addresses, setAddresses] = useState<Address[]>([]);
   const debouncedSearchQuery = useDebounce(searchQuery, 1000);
 
-  const onChangeText = async (text: string) => {
+  const onChangeText = (text: string) => {
     setSearchQuery(text);
     if (!text) {
       if (type == 'origin') {
@@ -61,39 +61,50 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
     }
   };
 
-  const doSearch = async (query: string) => {
-    try {
-      setIsSearching(true);
-      const data = await onemapService.search(query);
-      setAddresses(data.results);
-    } catch (error) {
-      setAddresses([]);
-      handleApiError('Onemap', error);
-    } finally {
-      setIsSearching(false);
+  const search = async () => {
+    const data = await onemapService.search(debouncedSearchQuery);
+    return data.results;
+  };
+
+  const handleOnEndEditing = async () => {
+    if (debouncedSearchQuery) {
+      setReloadKey(reloadKey + 1);
     }
   };
 
-  useEffect(() => {
-    if (debouncedSearchQuery) {
-      doSearch(debouncedSearchQuery);
-    } else {
-      setAddresses([]);
-    }
-  }, [debouncedSearchQuery]);
-
-  const onRefresh = async () => {
-    if (debouncedSearchQuery) {
-      await doSearch(debouncedSearchQuery);
-    }
+  const setCurrentLocation = () => {
+    Geolocation.getCurrentPosition(info => {
+      if (info && info.coords) {
+        setOrigin(dispatch, {
+          LATITUDE: info.coords.latitude,
+          LONGITUDE: info.coords.longitude,
+          SEARCHVAL: 'Current location',
+          BLK_NO: '',
+          ROAD_NAME: '',
+          BUILDING: '',
+          ADDRESS: '',
+          POSTAL: '',
+          X: info.coords.latitude,
+          Y: info.coords.longitude,
+        });
+        navigation.goBack();
+      }
+    });
   };
 
   const renderFirstItem = ({type}: {type: 'origin' | 'destination'}) => {
     if (type == 'origin') {
       return (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={setCurrentLocation}>
           <View style={styles.row}>
-            <Text style={styles.rowText}>Current localtion</Text>
+            <FontAwesomeIcon
+              icon={faLocationArrow}
+              color={colors.gray}
+              size={sizes.md}
+            />
+            <Text style={[styles.rowText, {marginLeft: sizes.sm}]}>
+              Current location
+            </Text>
           </View>
         </TouchableOpacity>
       );
@@ -113,7 +124,24 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
     return (
       <TouchableOpacity onPress={handlePress}>
         <View style={styles.row}>
-          <Text style={styles.rowText}>{item.ADDRESS}</Text>
+          <View>
+            <View>
+              <Text
+                style={[
+                  styles.rowText,
+                  {fontWeight: '500', fontSize: sizes.md, color: colors.dark},
+                ]}>
+                {item.SEARCHVAL}
+              </Text>
+            </View>
+            {item.SEARCHVAL != item.ADDRESS && (
+              <View style={{marginTop: sizes.xxs}}>
+                <Text style={[styles.rowText, {fontSize: sizes.md - 2}]}>
+                  {item.ADDRESS}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -143,33 +171,32 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
             color={colors.gray}
           />
           <TextInput
+            ref={inputRef}
             placeholder={placeholder}
             style={styles.input}
             placeholderTextColor={colors.gray}
-            autoFocus={!searchQuery}
+            autoFocus={true}
             clearButtonMode={'always'}
             onChangeText={onChangeText}
             value={searchQuery}
             keyboardType="default"
+            enterKeyHint="search"
+            enablesReturnKeyAutomatically={true}
+            onEndEditing={handleOnEndEditing}
           />
         </View>
       </View>
-      <FlatList
-        data={addresses}
-        keyExtractor={addr => addr.ADDRESS}
-        renderItem={renderAddress}
-        refreshing={isSearching}
-        ListHeaderComponent={renderFirstItem({type})}
-        refreshControl={
-          <RefreshControl
-            refreshing={isSearching}
-            onRefresh={onRefresh}
-            colors={[colors.gray]} // Customize the refresh indicator color(s)
-            tintColor={colors.gray} // iOS only: Customize the spinning indicator color
-            title={'Pull to Refresh'} // iOS only: Text shown while pulling down to refresh
-          />
-        }
-      />
+      {!debouncedSearchQuery ? (
+        renderFirstItem({type})
+      ) : (
+        <FetchableFlatList
+          fetchData={search}
+          keyExtractor={addr => addr.ADDRESS}
+          renderItem={renderAddress}
+          ListHeaderComponent={renderFirstItem({type})}
+          dependencies={[debouncedSearchQuery, reloadKey]}
+        />
+      )}
     </View>
   );
 };
@@ -177,6 +204,7 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.lightGray,
   },
   headerBar: {
     height: sizes.x4xlg,
@@ -207,11 +235,17 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
     paddingHorizontal: sizes.md,
     paddingVertical: sizes.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.lightGray,
   },
   rowText: {
     fontSize: sizes.md,
     color: colors.dark,
+    textTransform: 'capitalize',
   },
 });

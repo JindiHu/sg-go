@@ -1,9 +1,14 @@
 import {Address} from '../../../services/onemap';
-import {SET_DESTINATION, SET_ORIGIN} from './route.constants';
+import {
+  PUSH_RECENT_SEARCHES,
+  SET_DESTINATION,
+  SET_ORIGIN,
+} from './route.constants';
 
 export type RouteState = {
   origin?: Address;
   destination?: Address;
+  recentSearches: Address[];
 };
 
 export type RouteAction = {
@@ -14,6 +19,7 @@ export type RouteAction = {
 export const initialRouteState = {
   origin: undefined,
   destination: undefined,
+  recentSearches: [],
 };
 
 export const routeReducer = (
@@ -25,6 +31,8 @@ export const routeReducer = (
       return {...state, origin: action.payload};
     case SET_DESTINATION:
       return {...state, destination: action.payload};
+    case PUSH_RECENT_SEARCHES:
+      return {...state};
     default:
       return state;
   }

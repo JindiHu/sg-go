@@ -1,16 +1,7 @@
 import {FC, useEffect, useState} from 'react';
-import {
-  FlatList,
-  Image,
-  ListRenderItem,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import {colors} from '../constants';
-import {handleApiError} from '../services/error';
+import {Image, ListRenderItem, StyleSheet, Text, View} from 'react-native';
 import {Shop, tourismHubService} from '../services/tourismHub';
+import {FetchableFlatList} from './FetchableFlatList';
 
 const ShopCard: FC<Shop> = props => {
   const [thumbnail, setThumbnail] = useState<string>();
@@ -48,29 +39,17 @@ const renderShopItem: ListRenderItem<Shop> = ({item}) => {
 };
 
 export const ShopList: FC = () => {
-  const [shops, setShops] = useState<Shop[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const fetchData = async () => {
-    try {
-      setIsRefreshing(true);
-      const data = await tourismHubService.getShops();
+    const data = await tourismHubService.getShops();
 
-      setShops(
-        data.filter(shop => {
-          if (shop.thumbnails.length > 0) {
-            if (shop.thumbnails[0].url || shop.thumbnails[0].uuid) {
-              return true;
-            }
-          }
-          return false;
-        }),
-      );
-    } catch (error) {
-      setShops([]);
-      handleApiError('tourismHub', error);
-    } finally {
-      setIsRefreshing(false);
-    }
+    return data.filter(shop => {
+      if (shop.thumbnails.length > 0) {
+        if (shop.thumbnails[0].url || shop.thumbnails[0].uuid) {
+          return true;
+        }
+      }
+      return false;
+    });
   };
 
   useEffect(() => {
@@ -82,23 +61,14 @@ export const ShopList: FC = () => {
   };
 
   return (
-    <FlatList
-      data={shops}
+    <FetchableFlatList
+      fetchData={fetchData}
       keyExtractor={shop => shop.uuid}
       renderItem={renderShopItem}
-      refreshing={isRefreshing}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={onRefresh}
-          colors={[colors.gray]} // Customize the refresh indicator color(s)
-          tintColor={colors.gray} // iOS only: Customize the spinning indicator color
-          title={'Pull to Refresh'} // iOS only: Text shown while pulling down to refresh
-        />
-      }
     />
   );
 };
+
 const styles = StyleSheet.create({
   shopItem: {
     flexDirection: 'row',

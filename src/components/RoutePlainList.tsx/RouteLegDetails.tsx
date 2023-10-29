@@ -75,9 +75,6 @@ const RouteLegDescription: FC<Leg> = props => {
                 ]}>
                 <Text style={styles.mrtBadgeText}>{props.routeLongName}</Text>
               </View>
-              <View style={styles.agencyName}>
-                <Text style={styles.agencyNameText}>{props.agencyName}</Text>
-              </View>
             </View>
             <IntermediateStops {...props} />
             <View style={styles.itineraryRouteLegStops}>
@@ -99,9 +96,6 @@ const RouteLegDescription: FC<Leg> = props => {
                   <Text style={styles.busBadgeText}>
                     {props.routeShortName}
                   </Text>
-                </View>
-                <View style={styles.agencyName}>
-                  <Text style={styles.agencyNameText}>{props.agencyName}</Text>
                 </View>
               </View>
               <IntermediateStops {...props} />
@@ -203,13 +197,5 @@ const styles = StyleSheet.create({
   },
   busBadgeText: {
     color: colors.white,
-  },
-  agencyName: {
-    marginLeft: sizes.sm,
-  },
-  agencyNameText: {
-    color: colors.gray,
-    fontSize: sizes.sm,
-    fontStyle: 'italic',
   },
 });

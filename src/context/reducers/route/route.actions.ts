@@ -23,3 +23,5 @@ export const setDestination = (
 export const unsetDestination = (dispatch: Dispatch<RouteAction>) => {
   dispatch({type: SET_DESTINATION, payload: undefined});
 };
+
+export const pushRecentSearch = () => {};

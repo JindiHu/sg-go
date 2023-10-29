@@ -7,7 +7,7 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
@@ -17,6 +17,7 @@ import {Itinerary, RoutePlan, onemapService} from '../../services/onemap';
 import {toHoursAndMinutes} from '../../utils';
 import {RouteLegDetails} from './RouteLegDetails';
 import {RouteLegSummary} from './RouteLegSummary';
+import {FetchableFlatList} from '../FetchableFlatList';
 
 type RoutePlanProps = {
   start: {
@@ -63,7 +64,7 @@ const ItineraryCard: FC<Itinerary> = props => {
 
   return (
     <View style={styles.itineraryCard}>
-      <TouchableOpacity onPress={handleOnPress}>
+      <TouchableWithoutFeedback onPress={handleOnPress}>
         <View style={styles.itinerarySummary}>
           <View style={styles.itinerarySummaryTime}>
             <Text style={styles.itinerarySummaryTimeTextLeft}>
@@ -76,7 +77,7 @@ const ItineraryCard: FC<Itinerary> = props => {
           </View>
           <View style={styles.itinerarySummaryPath}>{summary}</View>
         </View>
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
       {isExpanded && <View>{details}</View>}
     </View>
   );
@@ -87,60 +88,31 @@ const renderItinerary: ListRenderItem<Itinerary> = ({item}) => {
 };
 
 export const RoutePlanList: FC<RoutePlanProps> = props => {
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  const [plan, setPlan] = useState<RoutePlan | undefined>();
-
   const getRoutePlan = async () => {
-    try {
-      setIsRefreshing(true);
-      const data = await onemapService.getRoutePlan({
-        start: {
-          latitude: props.start.latitude,
-          longitude: props.start.longitude,
-        },
-        end: {
-          latitude: props.end.latitude,
-          longitude: props.end.longitude,
-        },
-      });
-
-      setPlan(data);
-    } catch (error) {
-      setPlan(undefined);
-      handleApiError('onemap', error);
-    } finally {
-      setIsRefreshing(false);
-    }
+    const data = await onemapService.getRoutePlan({
+      start: {
+        latitude: props.start.latitude,
+        longitude: props.start.longitude,
+      },
+      end: {
+        latitude: props.end.latitude,
+        longitude: props.end.longitude,
+      },
+    });
+    return data.plan.itineraries;
   };
-
-  const onRefresh = () => {
-    getRoutePlan(); // Fetch data when the user pulls down to refresh
-  };
-
-  useEffect(() => {
-    getRoutePlan();
-  }, [
-    props.start.latitude,
-    props.start.longitude,
-    props.end.latitude,
-    props.end.longitude,
-  ]);
 
   return (
-    <FlatList
+    <FetchableFlatList
       style={styles.container}
-      data={plan?.plan.itineraries}
+      fetchData={getRoutePlan}
       renderItem={renderItinerary}
-      refreshing={isRefreshing}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={onRefresh}
-          colors={[colors.gray]} // Customize the refresh indicator color(s)
-          tintColor={colors.gray} // iOS only: Customize the spinning indicator color
-          title={'Pull to Refresh'} // iOS only: Text shown while pulling down to refresh
-        />
-      }
+      dependencies={[
+        props.start.latitude,
+        props.start.longitude,
+        props.end.latitude,
+        props.end.longitude,
+      ]}
     />
   );
 };
