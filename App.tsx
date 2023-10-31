@@ -7,6 +7,9 @@ import {RootStack} from './src/components/navigations/RootStack';
 import {colors} from './src/constants';
 import {Provider} from './src/context/AppContext';
 import {initialAppState} from './src/context/reducers/rootReducer';
+import {LogBox} from 'react-native';
+
+LogBox.ignoreLogs(['Could not find image']);
 
 const AppTheme = {
   ...DefaultTheme,

@@ -10,7 +10,7 @@ type Thumbnail = {
 export type Place = {
   uuid: string;
   name: string;
-  rating: string;
+  rating: number;
   description: string;
   location: {
     latitude: number;
@@ -115,7 +115,7 @@ class TourismHubService {
     return shops;
   };
 
-  public getAttriactions = async (): Promise<Place[]> => {
+  public getAttractions = async (): Promise<Place[]> => {
     const possibleSearchValues = [
       'Full-Day',
       'Adventure',

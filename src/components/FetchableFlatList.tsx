@@ -84,7 +84,6 @@ export const FetchableFlatList: FetchableFlatListProps = ({
 
   return (
     <FlatList
-      {...flatListProps}
       data={data}
       refreshing={isRefreshing}
       refreshControl={
@@ -96,6 +95,7 @@ export const FetchableFlatList: FetchableFlatListProps = ({
           title={'Pull to Refresh'} // iOS only: Text shown while pulling down to refresh
         />
       }
+      {...flatListProps}
     />
   );
 };
