@@ -1,21 +1,24 @@
 import {DependencyList, FC, useEffect, useState} from 'react';
-import {Dimensions} from 'react-native';
+import {Alert, Dimensions} from 'react-native';
 import {Image, ListRenderItem, StyleSheet, Text, View} from 'react-native';
 import {Place, tourismHubService} from '../services/tourismHub';
 import {FetchableFlatList} from './FetchableFlatList';
 import {colors, sizes} from '../constants';
 import Rating from './Rating';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 type PlaceListProps = {
   fetchData: () => Promise<Place[]>;
   numOfItemsPerPage?: number;
   dependencies?: DependencyList;
+  onCardPress: (p: Place) => void;
 };
 
 export const PlaceList: FC<PlaceListProps> = ({
   fetchData,
   numOfItemsPerPage = 2,
   dependencies = [],
+  onCardPress,
 }) => {
   const PlaceCard: FC<Place> = props => {
     const windowWidth = Dimensions.get('window').width;
@@ -34,10 +37,10 @@ export const PlaceList: FC<PlaceListProps> = ({
           setThumbnail(props.thumbnails[0].url);
         } else if (props.thumbnails[0].uuid) {
           try {
-            const base64 = await tourismHubService.getMedia(
+            const path = await tourismHubService.getMedia(
               props.thumbnails[0].uuid,
             );
-            setThumbnail(base64);
+            setThumbnail(path);
           } catch (_) {}
         }
       }
@@ -46,26 +49,36 @@ export const PlaceList: FC<PlaceListProps> = ({
       fetchImage();
     }, []);
 
+    const handlePress = () => {
+      onCardPress(props);
+    };
+
     return (
-      <View style={[styles.placeItem, {width: containerWidth}]}>
-        <View style={styles.thumbnail}>
-          <Image
-            source={{uri: thumbnail}}
-            style={[
-              {width: imageWidth, height: imageHeight, borderRadius: sizes.xs},
-            ]}
-          />
-          <View style={styles.ratingBackground}></View>
-          <View style={styles.rating}>
-            <Rating value={props.rating} totalStars={5} />
+      <TouchableWithoutFeedback onPress={handlePress}>
+        <View style={[styles.placeItem, {width: containerWidth}]}>
+          <View style={styles.thumbnail}>
+            <Image
+              source={{uri: thumbnail}}
+              style={[
+                {
+                  width: imageWidth,
+                  height: imageHeight,
+                  borderRadius: sizes.xs,
+                },
+              ]}
+            />
+            <View style={styles.ratingBackground}></View>
+            <View style={styles.rating}>
+              <Rating value={props.rating} totalStars={5} />
+            </View>
+          </View>
+          <View style={styles.placeInfo}>
+            <Text style={styles.placeName} numberOfLines={1}>
+              {props.name}
+            </Text>
           </View>
         </View>
-        <View style={styles.placeInfo}>
-          <Text style={styles.placeName} numberOfLines={1}>
-            {props.name}
-          </Text>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   };
 
@@ -92,6 +105,7 @@ export const PlaceList: FC<PlaceListProps> = ({
 
   return (
     <FetchableFlatList
+      style={styles.listContainer}
       fetchData={doFetch}
       keyExtractor={place => place.uuid}
       renderItem={renderPlaceItem}
@@ -107,9 +121,11 @@ export const PlaceList: FC<PlaceListProps> = ({
 };
 
 const styles = StyleSheet.create({
+  listContainer: {
+    backgroundColor: colors.white,
+  },
   placeItem: {
     alignItems: 'center',
-    backgroundColor: colors.white,
     paddingVertical: sizes.md,
   },
   thumbnail: {

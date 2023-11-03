@@ -1,14 +1,9 @@
-import {
-  faHouse,
-  faLocationPin,
-  faStar,
-} from '@fortawesome/free-solid-svg-icons';
+import {faHouse, faLocationPin} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {FC, PropsWithChildren} from 'react';
 import {Animated, Easing} from 'react-native';
 import {colors} from '../../constants';
-import {ProfileScreen} from '../screens/ProfileScreen';
 import {HomeStack} from './HomeStack';
 import {RouteStack} from './RouteStack';
 
@@ -67,15 +62,6 @@ const tabRoutes = [
     tabBarIcon: ({focused, color, size}: IconProps) => (
       <IconContainer focused={focused}>
         <FontAwesomeIcon icon={faLocationPin} color={color} size={size} />
-      </IconContainer>
-    ),
-  },
-  {
-    name: 'Favourite',
-    component: ProfileScreen,
-    tabBarIcon: ({focused, color, size}: IconProps) => (
-      <IconContainer focused={focused}>
-        <FontAwesomeIcon icon={faStar} color={color} size={size} />
       </IconContainer>
     ),
   },

@@ -2,9 +2,19 @@ import axios, {AxiosInstance} from 'axios';
 import {urlConfig} from '../config/url';
 import {TIH_API_KEY} from '@env';
 
-type Thumbnail = {
+type Image = {
   uuid: string;
   url: string;
+};
+
+type Review = {
+  authorName: string;
+  authorURL: string;
+  language: string;
+  profilePhoto: string;
+  rating: 5;
+  text: string;
+  time: string;
 };
 
 export type Place = {
@@ -12,6 +22,7 @@ export type Place = {
   name: string;
   rating: number;
   description: string;
+  body: string;
   location: {
     latitude: number;
     longitude: number;
@@ -26,7 +37,9 @@ export type Place = {
   };
   nearestMrtStation: string;
   officialWebsite: string;
-  thumbnails: Thumbnail[];
+  thumbnails: Image[];
+  images: Image[];
+  reviews: Review[];
 };
 
 class TourismHubService {

@@ -6,7 +6,8 @@ import {FC} from 'react';
 import {Animated} from 'react-native';
 import {colors} from '../../constants';
 import {HomeScreen} from '../screens/HomeScreen';
-import {ProfileScreen} from '../screens/ProfileScreen';
+import {Place} from '../../services/tourismHub';
+import {PlaceDetailsScreen} from '../screens/PlaceDetailsScreen';
 
 const homeStackRoutes = {};
 
@@ -33,6 +34,7 @@ const forFade = ({current, next}: StackHeaderInterpolationProps) => {
 
 export type HomeStackParamList = {
   Home: undefined;
+  Place: Place;
 };
 const Stack = createStackNavigator<HomeStackParamList>();
 
@@ -48,13 +50,8 @@ export const HomeStack: FC = () => {
         animationEnabled: true,
         headerStyleInterpolator: forFade,
       }}>
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: 'Awesome app',
-        }}
-      />
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Place" component={PlaceDetailsScreen} />
     </Stack.Navigator>
   );
 };

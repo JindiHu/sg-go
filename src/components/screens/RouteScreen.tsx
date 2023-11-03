@@ -79,7 +79,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
           </TouchableWithoutFeedback>
         </View>
       </Card>
-      {state.route.origin && state.route.destination ? (
+      {state.route.origin && state.route.destination && (
         <RoutePlanList
           start={{
             latitude: state.route.origin.LATITUDE,
@@ -90,8 +90,6 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
             longitude: state.route.destination.LONGITUDE,
           }}
         />
-      ) : (
-        <PlaceList fetchData={tourismHubService.getShops} />
       )}
     </View>
   );

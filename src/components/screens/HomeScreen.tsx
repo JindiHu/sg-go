@@ -2,7 +2,7 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {FC, useState} from 'react';
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {colors, sizes} from '../../constants';
-import {tourismHubService} from '../../services/tourismHub';
+import {Place, tourismHubService} from '../../services/tourismHub';
 import {Header} from '../Header/Header';
 import {PlaceList} from '../PlaceList';
 import {ParamList} from '../navigations/RootStack';
@@ -15,6 +15,11 @@ export const HomeScreen: FC<StackScreenProps<ParamList, 'Home'>> = ({
   const onRefresh = () => {
     setReloadKey(reloadKey + 1);
   };
+
+  const handleCardPress = (place: Place) => {
+    navigation.navigate('Place', place);
+  };
+
   return (
     <View style={styles.container}>
       <Header route={route} navigation={navigation} />
@@ -36,6 +41,7 @@ export const HomeScreen: FC<StackScreenProps<ParamList, 'Home'>> = ({
             fetchData={tourismHubService.getAttractions}
             numOfItemsPerPage={2}
             dependencies={[reloadKey]}
+            onCardPress={handleCardPress}
           />
         </View>
         <View style={styles.content}>
@@ -46,6 +52,7 @@ export const HomeScreen: FC<StackScreenProps<ParamList, 'Home'>> = ({
             fetchData={tourismHubService.getAccommodation}
             numOfItemsPerPage={3}
             dependencies={[reloadKey]}
+            onCardPress={handleCardPress}
           />
         </View>
         <View style={styles.content}>
@@ -56,6 +63,7 @@ export const HomeScreen: FC<StackScreenProps<ParamList, 'Home'>> = ({
             fetchData={tourismHubService.getBarsClubs}
             numOfItemsPerPage={2}
             dependencies={[reloadKey]}
+            onCardPress={handleCardPress}
           />
         </View>
         <View style={styles.content}>
@@ -66,6 +74,7 @@ export const HomeScreen: FC<StackScreenProps<ParamList, 'Home'>> = ({
             fetchData={tourismHubService.getShops}
             numOfItemsPerPage={3}
             dependencies={[reloadKey]}
+            onCardPress={handleCardPress}
           />
         </View>
       </ScrollView>
