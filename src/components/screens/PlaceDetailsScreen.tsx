@@ -1,12 +1,13 @@
 import {
-  faAddressBook,
-  faAddressCard,
   faChevronLeft,
+  faLocationArrow,
   faLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {StackScreenProps} from '@react-navigation/stack';
-import {FC, useEffect, useState} from 'react';
+import Geolocation from '@react-native-community/geolocation';
+import moment from 'moment';
+import {FC} from 'react';
 import {
   Dimensions,
   Image,
@@ -16,15 +17,18 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {colors, sizes} from '../../constants';
-import {Header} from '../Header/Header';
-import {ParamList} from '../navigations/RootStack';
 import {ScrollView} from 'react-native-gesture-handler';
+import {colors, sizes} from '../../constants';
 import {tourismHubService} from '../../services/tourismHub';
-import HTMLView from 'react-native-htmlview';
-import Rating from '../Rating';
 import {FetchableFlatList} from '../FetchableFlatList';
-import moment from 'moment';
+import {Header} from '../Header/Header';
+import Rating from '../Rating';
+import {ParamList} from '../navigations/RootStack';
+import {useAppContext} from '../../context/AppContext';
+import {
+  setDestination,
+  setOrigin,
+} from '../../context/reducers/route/route.actions';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -46,6 +50,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
   navigation,
 }) => {
   const place = route.params;
+  const {dispatch} = useAppContext();
 
   const fetchImage = async () => {
     const images: string[] = [];
@@ -65,7 +70,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
     return images;
   };
 
-  const addrList = [];
+  const addrList: string[] = [];
   if (place.address.block) {
     addrList.push(place.address.block);
   }
@@ -78,6 +83,38 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
   if (place.address.postalCode) {
     addrList.push(`(Singapore ${place.address.postalCode})`);
   }
+
+  const handleCheckPublicTransport = () => {
+    Geolocation.getCurrentPosition(info => {
+      if (info && info.coords) {
+        setOrigin(dispatch, {
+          LATITUDE: info.coords.latitude,
+          LONGITUDE: info.coords.longitude,
+          SEARCHVAL: 'Current location',
+          BLK_NO: '',
+          ROAD_NAME: '',
+          BUILDING: '',
+          ADDRESS: '',
+          POSTAL: '',
+          X: info.coords.latitude,
+          Y: info.coords.longitude,
+        });
+        setDestination(dispatch, {
+          LATITUDE: place.location.latitude,
+          LONGITUDE: place.location.longitude,
+          SEARCHVAL: place.name,
+          BLK_NO: place.address.block,
+          ROAD_NAME: place.address.streetName,
+          BUILDING: place.address.buildingName,
+          ADDRESS: addrList.join(' '),
+          POSTAL: place.address.postalCode,
+          X: info.coords.latitude,
+          Y: info.coords.longitude,
+        });
+        navigation.navigate('Root', {screen: 'RouteStack'});
+      }
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -106,6 +143,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
           <Rating value={place.rating} totalStars={5} />
         </View>
         <FetchableFlatList
+          keyExtractor={item => item.uuid}
           fetchData={fetchImage}
           renderItem={renderImageItem}
           horizontal={true}
@@ -132,6 +170,20 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
             <Text style={{color: colors.gray}}>{addrList.join(' ')}</Text>
           </View>
         </View>
+        <View style={styles.publicTransport}>
+          <TouchableWithoutFeedback onPress={handleCheckPublicTransport}>
+            <View style={styles.publicTransportButton}>
+              <FontAwesomeIcon
+                icon={faLocationArrow}
+                size={sizes.md}
+                color={colors.white}
+              />
+              <Text style={styles.publicTransportButtonText}>
+                Check Public Transport
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
         {place.reviews.length > 0 && (
           <View style={styles.reviewSummary}>
             <View style={styles.reviewSummaryTitle}>
@@ -141,7 +193,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
             </View>
             {place.reviews.map(review => {
               return (
-                <View style={styles.review}>
+                <View style={styles.review} key={review.authorURL}>
                   <View style={styles.profile}>
                     <Image
                       source={{uri: review.profilePhoto}}
@@ -235,7 +287,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  addressIcon: {marginRight: sizes.lg},
+  addressIcon: {
+    marginRight: sizes.lg,
+  },
+  publicTransport: {
+    marginLeft: sizes.xxlg,
+    marginBottom: sizes.sm,
+    paddingHorizontal: sizes.lg,
+    flexDirection: 'row',
+  },
+  publicTransportButton: {
+    backgroundColor: colors.green,
+    paddingHorizontal: sizes.lg,
+    paddingVertical: sizes.xs,
+    borderRadius: sizes.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  publicTransportButtonText: {
+    paddingHorizontal: sizes.lg,
+    fontSize: sizes.md,
+    fontWeight: '500',
+    color: colors.white,
+    textAlign: 'center',
+  },
   buildingName: {
     fontSize: sizes.md,
     color: colors.dark,

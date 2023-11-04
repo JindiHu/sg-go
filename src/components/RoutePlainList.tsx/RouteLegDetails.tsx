@@ -104,7 +104,7 @@ const RouteLegDescription: FC<Leg> = props => {
               </View>
             </View>
             <BusArrival
-              busStopCode={props.from.stopCode}
+              busStopCode={props.from.stopCode || ''}
               serviceNo={props.routeId}
             />
           </View>
@@ -135,9 +135,6 @@ export const RouteLegDetails: FC<Leg> = props => {
         <View style={styles.itineraryRouteLeg}>
           <RouteLegDescription {...props} />
         </View>
-      </View>
-      <View>
-        <Text></Text>
       </View>
     </View>
   );

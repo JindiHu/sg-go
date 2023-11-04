@@ -6,6 +6,7 @@ export type RouteStackParamList = {
   Route: undefined;
   Profile: undefined;
 };
+
 const Stack = createStackNavigator<RouteStackParamList>();
 
 export const RouteStack: FC = () => {
@@ -15,7 +16,7 @@ export const RouteStack: FC = () => {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Route" component={RouteScreen} options={{}} />
+      <Stack.Screen name="Route" component={RouteScreen} />
     </Stack.Navigator>
   );
 };

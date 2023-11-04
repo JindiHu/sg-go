@@ -30,6 +30,7 @@ import {Address, onemapService} from '../../services/onemap';
 import {FetchableFlatList} from '../FetchableFlatList';
 import {Header} from '../Header/Header';
 import {ParamList} from '../navigations/RootStack';
+import {AddressPanel} from '../AddressPanel';
 
 export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
   route,
@@ -113,40 +114,17 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
   };
 
   const renderAddress: ListRenderItem<Address> = ({item}) => {
-    const handlePress = () => {
+    const handlePress = (address: Address) => {
       if (type == 'origin') {
-        setOrigin(dispatch, item);
+        setOrigin(dispatch, address);
       } else {
-        setDestination(dispatch, item);
+        setDestination(dispatch, address);
       }
-      pushRecentSearch(dispatch, item);
+      pushRecentSearch(dispatch, address);
       navigation.goBack();
     };
 
-    return (
-      <TouchableOpacity onPress={handlePress}>
-        <View style={styles.row}>
-          <View>
-            <View>
-              <Text
-                style={[
-                  styles.rowText,
-                  {fontWeight: '500', fontSize: sizes.md, color: colors.dark},
-                ]}>
-                {item.SEARCHVAL}
-              </Text>
-            </View>
-            {item.SEARCHVAL != item.ADDRESS && (
-              <View style={{marginTop: sizes.xxs}}>
-                <Text style={[styles.rowText, {fontSize: sizes.md - 2}]}>
-                  {item.ADDRESS}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
+    return <AddressPanel {...item} onPress={handlePress} />;
   };
 
   return (
@@ -193,7 +171,7 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
       ) : (
         <FetchableFlatList
           fetchData={search}
-          keyExtractor={addr => addr.ADDRESS}
+          keyExtractor={addr => addr.ADDRESS + addr.postalCode}
           renderItem={renderAddress}
           ListHeaderComponent={renderFirstItem({type})}
           dependencies={[debouncedSearchQuery, reloadKey]}

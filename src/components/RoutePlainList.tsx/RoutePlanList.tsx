@@ -1,23 +1,21 @@
 import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import moment from 'moment';
-import {FC, Fragment, useEffect, useState} from 'react';
+import {FC, Fragment, useState} from 'react';
 import {
   ListRenderItem,
-  RefreshControl,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
 import {colors, sizes} from '../../constants';
-import {handleApiError} from '../../services/error';
-import {Itinerary, RoutePlan, onemapService} from '../../services/onemap';
+import {Itinerary, onemapService} from '../../services/onemap';
 import {toHoursAndMinutes} from '../../utils';
+import {FetchableFlatList} from '../FetchableFlatList';
 import {RouteLegDetails} from './RouteLegDetails';
 import {RouteLegSummary} from './RouteLegSummary';
-import {FetchableFlatList} from '../FetchableFlatList';
+import {mockRoutePlan} from '../../mock/oneMapRoutePlan';
 
 type RoutePlanProps = {
   start: {
@@ -89,17 +87,21 @@ const renderItinerary: ListRenderItem<Itinerary> = ({item}) => {
 
 export const RoutePlanList: FC<RoutePlanProps> = props => {
   const getRoutePlan = async () => {
-    const data = await onemapService.getRoutePlan({
-      start: {
-        latitude: props.start.latitude,
-        longitude: props.start.longitude,
-      },
-      end: {
-        latitude: props.end.latitude,
-        longitude: props.end.longitude,
-      },
-    });
-    return data.plan.itineraries;
+    try {
+      const data = await onemapService.getRoutePlan({
+        start: {
+          latitude: props.start.latitude,
+          longitude: props.start.longitude,
+        },
+        end: {
+          latitude: props.end.latitude,
+          longitude: props.end.longitude,
+        },
+      });
+      return data.plan.itineraries;
+    } catch (e) {
+      return mockRoutePlan.plan.itineraries;
+    }
   };
 
   return (

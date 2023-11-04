@@ -33,13 +33,14 @@ type AuthHeaders = {
   Authorization: string;
 };
 
-type Location = {
+export type Coordinates = {
   latitude: number;
   longitude: number;
 };
+
 export type RoutePlanParams = {
-  start: Location;
-  end: Location;
+  start: Coordinates;
+  end: Coordinates;
 };
 
 export type RoutePlanLocaltion = {
@@ -49,11 +50,11 @@ export type RoutePlanLocaltion = {
   orig?: string;
   departure?: number;
   arrival?: number;
-  vertexType: string;
-  stopId: string;
-  stopCode: string;
-  stopIndex: number;
-  stopSequence: number;
+  vertexType?: string;
+  stopId?: string;
+  stopCode?: string;
+  stopIndex?: number;
+  stopSequence?: number;
 };
 
 export type Leg = {

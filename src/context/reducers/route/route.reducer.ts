@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {Address} from '../../../services/onemap';
 import {
   PUSH_RECENT_SEARCHES,
@@ -8,7 +9,7 @@ import {
 export type RouteState = {
   origin?: Address;
   destination?: Address;
-  recentSearches: Address[];
+  recentSearches: Record<string, Address & {timestamp: number}>;
 };
 
 export type RouteAction = {
@@ -19,7 +20,7 @@ export type RouteAction = {
 export const initialRouteState = {
   origin: undefined,
   destination: undefined,
-  recentSearches: [],
+  recentSearches: {},
 };
 
 export const routeReducer = (
@@ -33,9 +34,26 @@ export const routeReducer = (
       return {...state, destination: action.payload};
     case PUSH_RECENT_SEARCHES:
       if (action.payload) {
+        const recentSearches = {...state.recentSearches};
+        const now = parseInt(moment().format('X'));
+        if (Object.keys(state.recentSearches).length > 10) {
+          let keyToRemove = '';
+          let currentTimestamp = parseInt(moment().format('X'));
+          Object.keys(recentSearches).forEach(postalCode => {
+            if (state.recentSearches[postalCode].timestamp < currentTimestamp) {
+              keyToRemove = postalCode;
+              currentTimestamp = state.recentSearches[postalCode].timestamp;
+            }
+          });
+          delete recentSearches[keyToRemove];
+        }
+
         return {
           ...state,
-          recentSearches: [action.payload, ...state.recentSearches.slice(0, 9)],
+          recentSearches: {
+            ...recentSearches,
+            [action.payload.POSTAL]: {...action.payload, timestamp: now},
+          },
         };
       }
     default:

@@ -1,6 +1,7 @@
+import {TIH_API_KEY} from '@env';
 import axios, {AxiosInstance} from 'axios';
 import {urlConfig} from '../config/url';
-import {TIH_API_KEY} from '@env';
+import {Coordinates, RoutePlanParams} from './onemap';
 
 type Image = {
   uuid: string;
@@ -23,10 +24,7 @@ export type Place = {
   rating: number;
   description: string;
   body: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
+  location: Coordinates;
   address: {
     block: string;
     streetName: string;
@@ -42,6 +40,63 @@ export type Place = {
   reviews: Review[];
 };
 
+type TihStep = {
+  distance: number;
+  duration: number;
+  startLocation: Coordinates;
+  endLocation: Coordinates;
+  htmlInstructions: string;
+  maneuver: string;
+} & (
+  | {travelMode: 'WALKING'}
+  | {
+      travelMode: 'TRANSIT';
+      transitDetail: {
+        arrivalStop: {
+          location: Coordinates;
+          name: string;
+        };
+        arrivalTime: number;
+        departureStop: {
+          location: Coordinates;
+          name: string;
+        };
+        departureTime: number;
+        line: {
+          name: string;
+          vehicle: {
+            name: string;
+            type: 'BUS' | 'SUBWAY';
+          };
+        };
+        numOfStops: number;
+      };
+      steps?: TihStep[];
+    }
+);
+
+type TihLeg = {
+  distance: number;
+  duration: number;
+  startAddress: string;
+  startLocation: Coordinates;
+  endAddress: string;
+  endLocation: Coordinates;
+  steps: TihStep[];
+};
+
+type TihRoute = {
+  distance: number;
+  duration: number;
+  legs: TihLeg[];
+};
+
+export type TihRoutesData = {
+  routes: TihRoute[];
+  distance: number;
+  duration: number;
+};
+
 class TourismHubService {
   public instance: AxiosInstance;
   constructor(url: string) {
@@ -53,6 +108,23 @@ class TourismHubService {
       },
     });
   }
+
+  public getRoutes = async (
+    params: RoutePlanParams,
+  ): Promise<TihRoutesData> => {
+    const res = await this.instance.get<{data: TihRoutesData}>(
+      '/services/navigation/v2/experiential-route/transit',
+      {
+        params: {
+          origin: `${params.start.latitude},${params.start.longitude}`,
+          destination: `${params.end.latitude},${params.end.longitude}`,
+          maxpoi: 8,
+        },
+      },
+    );
+
+    return res.data.data;
+  };
 
   public getMedia = async (uuid: string): Promise<string> => {
     const res = await this.instance.get<Blob>(`/media/download/v2/${uuid}`, {

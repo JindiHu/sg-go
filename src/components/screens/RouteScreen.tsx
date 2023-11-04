@@ -5,23 +5,32 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {StackScreenProps} from '@react-navigation/stack';
+import Geolocation from '@react-native-community/geolocation';
 import {FC} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import {
+  ScrollView,
+  TouchableWithoutFeedback,
+} from 'react-native-gesture-handler';
 import {colors, sizes} from '../../constants';
 import {useAppContext} from '../../context/AppContext';
-import {tourismHubService} from '../../services/tourismHub';
+import {getRecentSearches} from '../../context/reducers/route/route.selectors';
+import {AddressPanel} from '../AddressPanel';
 import {Card} from '../Card/Card';
 import {Header} from '../Header/Header';
-import {PlaceList} from '../PlaceList';
 import {RoutePlanList} from '../RoutePlainList.tsx/RoutePlanList';
 import {ParamList} from '../navigations/RootStack';
+import {Address} from '../../services/onemap';
+import {
+  setDestination,
+  setOrigin,
+} from '../../context/reducers/route/route.actions';
 
 export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
   route,
   navigation,
 }) => {
-  const {state} = useAppContext();
+  const {state, dispatch} = useAppContext();
 
   const headerHeight = sizes.xxxlg + sizes.md * 2 + sizes.md / 2;
 
@@ -31,6 +40,26 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
 
   const handleOnPressDestination = () => {
     navigation.navigate('SearchAddress', {type: 'destination'});
+  };
+
+  const handleOnPressHistory = (address: Address) => {
+    Geolocation.getCurrentPosition(info => {
+      if (info && info.coords) {
+        setOrigin(dispatch, {
+          LATITUDE: info.coords.latitude,
+          LONGITUDE: info.coords.longitude,
+          SEARCHVAL: 'Current location',
+          BLK_NO: '',
+          ROAD_NAME: '',
+          BUILDING: '',
+          ADDRESS: '',
+          POSTAL: '',
+          X: info.coords.latitude,
+          Y: info.coords.longitude,
+        });
+        setDestination(dispatch, address);
+      }
+    });
   };
 
   return (
@@ -79,7 +108,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
           </TouchableWithoutFeedback>
         </View>
       </Card>
-      {state.route.origin && state.route.destination && (
+      {state.route.origin && state.route.destination ? (
         <RoutePlanList
           start={{
             latitude: state.route.origin.LATITUDE,
@@ -90,6 +119,23 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
             longitude: state.route.destination.LONGITUDE,
           }}
         />
+      ) : (
+        <View>
+          <View>
+            <Text style={styles.recentSearchText}>Search history</Text>
+          </View>
+          <ScrollView>
+            {getRecentSearches(state).map(address => {
+              return (
+                <AddressPanel
+                  key={address.POSTAL}
+                  {...address}
+                  onPress={handleOnPressHistory}
+                />
+              );
+            })}
+          </ScrollView>
+        </View>
       )}
     </View>
   );
@@ -123,5 +169,11 @@ const styles = StyleSheet.create({
   searchBarText: {
     color: colors.gray,
     textTransform: 'capitalize',
+  },
+  recentSearchText: {
+    marginRight: sizes.md,
+    textAlign: 'right',
+    fontSize: sizes.sm,
+    color: colors.gray,
   },
 });

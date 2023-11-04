@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   errorMessage: {
+    paddingTop: sizes.lg,
     color: colors.gray,
   },
   retryButton: {
