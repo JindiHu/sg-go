@@ -120,8 +120,8 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
           }}
         />
       ) : (
-        <View>
-          <View>
+        <View style={{flex: 1, backgroundColor: colors.lightGray}}>
+          <View style={{backgroundColor: colors.white}}>
             <Text style={styles.recentSearchText}>Recent history</Text>
           </View>
           <ScrollView>
