@@ -61,7 +61,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
       }
     });
   };
-
+  const recentSearches = getRecentSearches(state);
   return (
     <View style={styles.container}>
       <Header route={route} navigation={navigation} height={headerHeight} />
@@ -120,22 +120,26 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
           }}
         />
       ) : (
-        <View style={{flex: 1, backgroundColor: colors.lightGray}}>
-          <View style={{backgroundColor: colors.white}}>
-            <Text style={styles.recentSearchText}>Recent history</Text>
-          </View>
-          <ScrollView>
-            {getRecentSearches(state).map(address => {
-              return (
-                <AddressPanel
-                  key={address.POSTAL}
-                  {...address}
-                  onPress={handleOnPressHistory}
-                />
-              );
-            })}
-          </ScrollView>
-        </View>
+        <>
+          {recentSearches.length > 0 && (
+            <View style={{flex: 1, backgroundColor: colors.lightGray}}>
+              <View style={{backgroundColor: colors.white}}>
+                <Text style={styles.recentSearchText}>Recent history</Text>
+              </View>
+              <ScrollView>
+                {getRecentSearches(state).map(address => {
+                  return (
+                    <AddressPanel
+                      key={address.POSTAL}
+                      {...address}
+                      onPress={handleOnPressHistory}
+                    />
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+        </>
       )}
     </View>
   );
