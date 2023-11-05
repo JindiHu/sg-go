@@ -1,10 +1,10 @@
-import {StackHeaderProps, StackNavigationProp} from '@react-navigation/stack';
+import {ParamListBase, Route} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import {FC} from 'react';
-import {View, StyleSheet, Text, Dimensions} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {colors, sizes} from '../../constants';
-import {ParamListBase, Route} from '@react-navigation/native';
+import {colors} from '../../constants';
 
 export type HeaderProps = {
   route: Route<string>;

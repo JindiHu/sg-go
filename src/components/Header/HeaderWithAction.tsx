@@ -10,7 +10,6 @@ type HeaderWithActionsProps = HeaderProps & {};
 export const HeaderWithActions: FC<HeaderWithActionsProps> = ({
   route,
   navigation,
-  height,
 }) => {
   return (
     <>

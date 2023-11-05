@@ -146,7 +146,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
           <Rating value={place.rating} totalStars={5} />
         </View>
         <FetchableFlatList
-          keyExtractor={item => item.uuid}
+          keyExtractor={(item, key) => `${item.uuid}-${key}`}
           fetchData={fetchImage}
           renderItem={renderImageItem}
           horizontal={true}
