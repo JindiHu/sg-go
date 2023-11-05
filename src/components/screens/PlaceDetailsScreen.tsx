@@ -191,9 +191,9 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
                 Reviews ({place.reviews.length})
               </Text>
             </View>
-            {place.reviews.map(review => {
+            {place.reviews.map((review, key) => {
               return (
-                <View style={styles.review} key={review.authorURL}>
+                <View style={styles.review} key={`${review.authorName}-${key}`}>
                   <View style={styles.profile}>
                     <Image
                       source={{uri: review.profilePhoto}}
