@@ -77,7 +77,7 @@ const RouteLegDescription: FC<Leg> = props => {
               </View>
             </View>
             <IntermediateStops {...props} />
-            <View style={styles.itineraryRouteLegStops}>
+            <View>
               <Text>{props.to.name}</Text>
             </View>
           </View>
@@ -99,7 +99,7 @@ const RouteLegDescription: FC<Leg> = props => {
                 </View>
               </View>
               <IntermediateStops {...props} />
-              <View style={styles.itineraryRouteLegStops}>
+              <View>
                 <Text>{props.to.name}</Text>
               </View>
             </View>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   itineraryDetailsEstimation: {
     color: colors.dark,
-    fontSize: sizes.sm,
+    fontSize: sizes.md - 2,
   },
   itineraryRouteLeg: {
     // marginTop: sizes.sm,

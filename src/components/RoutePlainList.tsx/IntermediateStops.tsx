@@ -72,8 +72,9 @@ export const IntermediateStops: FC<Leg> = props => {
 const styles = StyleSheet.create({
   itineraryRouteLegStops: {
     flexDirection: 'row',
-    marginTop: sizes.xs,
+    paddingVertical: sizes.xs,
     alignItems: 'center',
+    flex: 1,
   },
   numberOfStopsText: {
     fontWeight: '500',
@@ -82,10 +83,10 @@ const styles = StyleSheet.create({
     marginLeft: sizes.lg,
   },
   intermediateStop: {
-    marginTop: sizes.xs,
+    marginBottom: sizes.xs,
   },
   intermediateStopText: {
     color: colors.gray,
-    fontSize: sizes.sm,
+    fontSize: sizes.md - 2,
   },
 });

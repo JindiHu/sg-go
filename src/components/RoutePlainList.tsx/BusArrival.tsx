@@ -46,33 +46,26 @@ export const BusArrival: FC<BusArrivalProps> = ({busStopCode, serviceNo}) => {
   const [durationInMin, setDurationInMin] = useState<number | null>();
   const [crowdingLevel, setCrowdingLevel] = useState<string | null>();
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      const busArrival = await ltaService.getBusArrival(busStopCode, serviceNo);
-      if (busArrival.Services.length > 0) {
-        const arrival = parseInt(
-          moment(busArrival.Services[0].NextBus.EstimatedArrival).format('X'),
+  const fetchData = (delayMs: number) => {
+    setIsLoading(true);
+    setTimeout(async () => {
+      try {
+        const busArrival = await ltaService.getBusArrival(
+          busStopCode,
+          serviceNo,
         );
-        const now = parseInt(moment().format('X'));
-        const def = arrival - now;
-        if (def > 0) {
-          setDurationInMin(Math.ceil(def / 60));
-          setCrowdingLevel(busArrival.Services[0].NextBus.Load);
-        } else {
+        if (busArrival.Services.length > 0) {
           const arrival = parseInt(
-            moment(busArrival.Services[0].NextBus2.EstimatedArrival).format(
-              'X',
-            ),
+            moment(busArrival.Services[0].NextBus.EstimatedArrival).format('X'),
           );
           const now = parseInt(moment().format('X'));
           const def = arrival - now;
           if (def > 0) {
             setDurationInMin(Math.ceil(def / 60));
-            setCrowdingLevel(busArrival.Services[0].NextBus2.Load);
+            setCrowdingLevel(busArrival.Services[0].NextBus.Load);
           } else {
             const arrival = parseInt(
-              moment(busArrival.Services[0].NextBus3.EstimatedArrival).format(
+              moment(busArrival.Services[0].NextBus2.EstimatedArrival).format(
                 'X',
               ),
             );
@@ -80,33 +73,46 @@ export const BusArrival: FC<BusArrivalProps> = ({busStopCode, serviceNo}) => {
             const def = arrival - now;
             if (def > 0) {
               setDurationInMin(Math.ceil(def / 60));
-              setCrowdingLevel(busArrival.Services[0].NextBus3.Load);
+              setCrowdingLevel(busArrival.Services[0].NextBus2.Load);
             } else {
-              setDurationInMin(null);
-              setCrowdingLevel('');
+              const arrival = parseInt(
+                moment(busArrival.Services[0].NextBus3.EstimatedArrival).format(
+                  'X',
+                ),
+              );
+              const now = parseInt(moment().format('X'));
+              const def = arrival - now;
+              if (def > 0) {
+                setDurationInMin(Math.ceil(def / 60));
+                setCrowdingLevel(busArrival.Services[0].NextBus3.Load);
+              } else {
+                setDurationInMin(null);
+                setCrowdingLevel('');
+              }
             }
           }
+        } else {
+          setDurationInMin(null);
+          setCrowdingLevel('');
         }
-      } else {
+      } catch (error) {
         setDurationInMin(null);
         setCrowdingLevel('');
+        handleApiError(error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      setDurationInMin(null);
-      setCrowdingLevel('');
-      handleApiError(error);
-    } finally {
-      setIsLoading(false);
-    }
+    }, delayMs);
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(0);
   }, [busStopCode, serviceNo]);
 
   const handlePress = () => {
-    fetchData();
+    fetchData(1000);
   };
+
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={handlePress}>
@@ -161,12 +167,12 @@ const styles = StyleSheet.create({
   },
   busArrivalTextUnit: {
     color: colors.white,
-    fontSize: sizes.sm,
+    fontSize: sizes.md - 2,
   },
   crowdingLevel: {
     marginTop: sizes.xs,
   },
   crowdingLevelText: {
-    fontSize: sizes.sm,
+    fontSize: sizes.md - 2,
   },
 });

@@ -164,7 +164,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
               color={colors.red}
             />
           </View>
-          <View>
+          <View style={{paddingLeft: sizes.xs}}>
             {place.address.buildingName && (
               <Text style={styles.buildingName}>
                 {place.address.buildingName}

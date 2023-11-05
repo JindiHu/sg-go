@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   recentSearchText: {
     marginRight: sizes.md,
     textAlign: 'right',
-    fontSize: sizes.sm,
+    fontSize: sizes.md - 2,
     color: colors.gray,
   },
 });

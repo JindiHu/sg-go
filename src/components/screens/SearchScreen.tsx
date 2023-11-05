@@ -8,7 +8,9 @@ import Geolocation from '@react-native-community/geolocation';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {FC, useState} from 'react';
 import {
+  KeyboardAvoidingView,
   ListRenderItem,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -169,13 +171,17 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
       {!debouncedSearchQuery ? (
         renderFirstItem({type})
       ) : (
-        <FetchableFlatList
-          fetchData={search}
-          keyExtractor={addr => addr.ADDRESS + addr.postalCode}
-          renderItem={renderAddress}
-          ListHeaderComponent={renderFirstItem({type})}
-          dependencies={[debouncedSearchQuery, reloadKey]}
-        />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.container}>
+          <FetchableFlatList
+            fetchData={search}
+            keyExtractor={addr => addr.ADDRESS + addr.postalCode}
+            renderItem={renderAddress}
+            ListHeaderComponent={renderFirstItem({type})}
+            dependencies={[debouncedSearchQuery, reloadKey]}
+          />
+        </KeyboardAvoidingView>
       )}
     </View>
   );

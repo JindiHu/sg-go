@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   },
   placeName: {
     textAlign: 'center',
-    fontSize: sizes.sm,
+    fontSize: sizes.md - 2,
     color: colors.gray,
   },
 });
