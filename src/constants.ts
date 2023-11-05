@@ -44,6 +44,8 @@ export const transportColors: {mrt: Record<string, string>; bus: string} = {
     SK: '#718573',
     PG: '#718573',
     SS: '#718573',
+    SW: '#718573',
+    PE: '#718573',
   },
   bus: '#94c83d',
 };

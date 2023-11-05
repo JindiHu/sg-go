@@ -122,7 +122,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
       ) : (
         <View>
           <View>
-            <Text style={styles.recentSearchText}>Search history</Text>
+            <Text style={styles.recentSearchText}>Recent history</Text>
           </View>
           <ScrollView>
             {getRecentSearches(state).map(address => {

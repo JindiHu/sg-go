@@ -78,9 +78,9 @@ export const BottomTab: FC = () => {
         tabBarShowLabel: false,
         tabBarActiveTintColor: colors.blue,
       }}>
-      {tabRoutes.map(route => (
+      {tabRoutes.map((route, key) => (
         <Tab.Screen
-          key={route.name}
+          key={`${route.name}-${key}`}
           name={route.name}
           component={route.component}
           options={{

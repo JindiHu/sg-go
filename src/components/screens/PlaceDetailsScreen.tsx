@@ -26,6 +26,7 @@ import Rating from '../Rating';
 import {ParamList} from '../navigations/RootStack';
 import {useAppContext} from '../../context/AppContext';
 import {
+  pushRecentSearch,
   setDestination,
   setOrigin,
 } from '../../context/reducers/route/route.actions';
@@ -81,7 +82,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
     addrList.push(`#${place.address.floorNumber}-${place.address.unitNumber}`);
   }
   if (place.address.postalCode) {
-    addrList.push(`(Singapore ${place.address.postalCode})`);
+    addrList.push(`Singapore ${place.address.postalCode}`);
   }
 
   const handleCheckPublicTransport = () => {
@@ -99,7 +100,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
           X: info.coords.latitude,
           Y: info.coords.longitude,
         });
-        setDestination(dispatch, {
+        const destination = {
           LATITUDE: place.location.latitude,
           LONGITUDE: place.location.longitude,
           SEARCHVAL: place.name,
@@ -110,7 +111,9 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
           POSTAL: place.address.postalCode,
           X: info.coords.latitude,
           Y: info.coords.longitude,
-        });
+        };
+        setDestination(dispatch, destination);
+        pushRecentSearch(dispatch, destination);
         navigation.navigate('Root', {screen: 'RouteStack'});
       }
     });
