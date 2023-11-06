@@ -50,7 +50,6 @@ export const usePersistReducer = (
           (await AsyncStorage.getItem(config.key)) || '',
         ) as AppState;
 
-        const clonedState = JSON.parse(JSON.stringify(appState)) as AppState;
         if (config.whitelist && config.whitelist.length > 0) {
           config.whitelist.forEach(keysStr => {
             try {
@@ -61,7 +60,7 @@ export const usePersistReducer = (
               );
               if (valueFromAsyncStorage) {
                 setValue(
-                  clonedState,
+                  persistState,
                   keysStr.split('.'),
                   valueFromAsyncStorage,
                 );

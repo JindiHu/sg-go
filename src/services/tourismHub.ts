@@ -2,7 +2,8 @@ import axios, {AxiosInstance} from 'axios';
 import {TIH_API_KEY} from '../config/envs';
 import {urlConfig} from '../config/url';
 import {Coordinates, RoutePlanParams} from './onemap';
-import Base64 from 'base64-js';
+import RNFetchBlob from 'rn-fetch-blob';
+import {Platform} from 'react-native';
 
 type Image = {
   uuid: string;
@@ -99,8 +100,10 @@ export type TihRoutesData = {
 };
 
 class TourismHubService {
+  public baseUrl: string;
   public instance: AxiosInstance;
   constructor(url: string) {
+    this.baseUrl = url;
     this.instance = axios.create({
       baseURL: url,
       headers: {
@@ -128,40 +131,19 @@ class TourismHubService {
   };
 
   public getMedia = async (uuid: string): Promise<string> => {
-    const res = await this.instance.get<Blob>(`/media/download/v2/${uuid}`, {
-      responseType: 'blob',
+    let dirs = RNFetchBlob.fs.dirs;
+    const res = await RNFetchBlob.config({
+      path: dirs.DocumentDir + `/${uuid}.png`,
+    }).fetch('GET', `${this.baseUrl}/media/download/v2/${uuid}`, {
+      'X-API-Key': TIH_API_KEY,
     });
-    const blob: Blob = res.data;
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.result) {
-          const base64String: string | ArrayBuffer | null = reader.result;
-          if (base64String !== null && typeof base64String === 'string') {
-            if (
-              base64String.startsWith('data:application/octet-stream;base64,')
-            ) {
-              const base64img = base64String.replace(
-                /^data:application\/octet-stream;base64,/,
-                '',
-              );
-              const imageUri = `data:image/png;base64,${base64img}`;
-              resolve(imageUri);
-            } else {
-              resolve(base64String);
-            }
-          } else {
-            reject('Conversion to base64 failed');
-          }
-        } else {
-          reject('Conversion to base64 failed');
-        }
-      };
-      reader.onerror = () => {
-        reject('FileReader error');
-      };
-      reader.readAsDataURL(blob);
-    });
+
+    if (res.info().status == 200) {
+      return Platform.OS === 'android'
+        ? 'file://' + res.path()
+        : '' + res.path();
+    }
+    return '';
   };
 
   public getShops = async (): Promise<Place[]> => {

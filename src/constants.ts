@@ -38,6 +38,7 @@ export const transportColors: {mrt: Record<string, string>; bus: string} = {
     CG: '#00964d',
     NE: '#8f4199',
     CC: '#f99d25',
+    CE: '#f99d25',
     DT: '#005da8',
     TE: '#9d5b25',
     BP: '#718573',

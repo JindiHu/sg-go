@@ -123,10 +123,10 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
         <>
           {recentSearches && recentSearches.length > 0 && (
             <View style={{flex: 1, backgroundColor: colors.lightGray}}>
-              <View style={{backgroundColor: colors.white}}>
-                <Text style={styles.recentSearchText}>Recent history</Text>
-              </View>
               <ScrollView>
+                <View style={{backgroundColor: colors.white}}>
+                  <Text style={styles.recentSearchText}>Recent history</Text>
+                </View>
                 {getRecentSearches(state).map(address => {
                   return (
                     <AddressPanel
@@ -179,5 +179,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: sizes.md - 2,
     color: colors.gray,
+    paddingTop: sizes.sm,
   },
 });
