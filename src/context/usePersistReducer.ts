@@ -86,7 +86,7 @@ export const usePersistReducer = (
       config.whitelist.length > 0 &&
       !isLoadingFromStorage
     ) {
-      const whitelistState = null;
+      const whitelistState = {};
       config.whitelist.forEach(keysStr => {
         try {
           // eslint-disable-next-line
