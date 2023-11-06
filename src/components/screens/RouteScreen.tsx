@@ -121,7 +121,7 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
         />
       ) : (
         <>
-          {recentSearches.length > 0 && (
+          {recentSearches && recentSearches.length > 0 && (
             <View style={{flex: 1, backgroundColor: colors.lightGray}}>
               <View style={{backgroundColor: colors.white}}>
                 <Text style={styles.recentSearchText}>Recent history</Text>

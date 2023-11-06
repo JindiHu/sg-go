@@ -41,7 +41,7 @@ const imageSize = containerWidth - sizes.lg;
 const renderImageItem: ListRenderItem<string> = ({item}) => {
   return (
     <View style={styles.thumbnailContainer}>
-      <Image source={{uri: item}} style={styles.thumbnail} />
+      {item && <Image source={{uri: item}} style={styles.thumbnail} />}
     </View>
   );
 };
@@ -55,7 +55,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
 
   const fetchImage = async () => {
     const images: string[] = [];
-    if (place.images.length > 0) {
+    if (place.images && place.images.length > 0) {
       for (let i = 0; i < place.images.length; i++) {
         if (place.images[i].url) {
           images.push(place.images[i].url);
@@ -187,7 +187,7 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
             </View>
           </TouchableWithoutFeedback>
         </View>
-        {place.reviews.length > 0 && (
+        {place.reviews && place.reviews.length > 0 && (
           <View style={styles.reviewSummary}>
             <View style={styles.reviewSummaryTitle}>
               <Text style={styles.reviewSummaryTitleText}>
@@ -198,10 +198,14 @@ export const PlaceDetailsScreen: FC<StackScreenProps<ParamList, 'Place'>> = ({
               return (
                 <View style={styles.review} key={`${review.authorName}-${key}`}>
                   <View style={styles.profile}>
-                    <Image
-                      source={{uri: review.profilePhoto}}
-                      style={styles.avatar}
-                    />
+                    {review.profilePhoto && (
+                      <Image
+                        source={{
+                          uri: review.profilePhoto,
+                        }}
+                        style={styles.avatar}
+                      />
+                    )}
                     <Text style={styles.authorName}>{review.authorName}</Text>
                   </View>
                   <View
@@ -278,6 +282,7 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     alignItems: 'center',
     width: containerWidth,
+    height: containerWidth,
   },
   thumbnail: {
     width: imageSize,

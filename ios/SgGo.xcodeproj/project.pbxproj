@@ -490,6 +490,7 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = SgGo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SgGo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -518,6 +519,7 @@
 				DEVELOPMENT_TEAM = T9F255A9VT;
 				INFOPLIST_FILE = SgGo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SgGo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -610,6 +612,7 @@
 					"-ld_classic",
 					"-Wl",
 					"-ld_classic",
+					"-Wl -ld_classic ",
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
@@ -686,6 +689,7 @@
 					"-ld_classic",
 					"-Wl",
 					"-ld_classic",
+					"-Wl -ld_classic ",
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;

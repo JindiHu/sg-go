@@ -1,7 +1,7 @@
 import axios, {AxiosInstance} from 'axios';
 import {urlConfig} from '../config/url';
-import {ONEMAP_PASSWORD, ONEMAP_USERNAME} from '@env';
 import moment from 'moment';
+import {ONEMAP_PASSWORD, ONEMAP_USERNAME} from '../config/envs';
 
 export type Address = {
   SEARCHVAL: string;
@@ -159,7 +159,7 @@ class OnemapService {
 
     const routes = res.data;
     routes.plan.itineraries.forEach(itinerary => {
-      if (itinerary.legs.length > 0) {
+      if (itinerary.legs && itinerary.legs.length > 0) {
         let prevLeg: Leg;
         const legs: Leg[] = [];
         itinerary.legs.forEach((leg, index) => {

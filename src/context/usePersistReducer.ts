@@ -61,7 +61,7 @@ export const usePersistReducer = (
               );
               if (valueFromAsyncStorage) {
                 setValue(
-                  persistState,
+                  clonedState,
                   keysStr.split('.'),
                   valueFromAsyncStorage,
                 );
@@ -87,7 +87,7 @@ export const usePersistReducer = (
       config.whitelist.length > 0 &&
       !isLoadingFromStorage
     ) {
-      const whitelistState = {};
+      const whitelistState = null;
       config.whitelist.forEach(keysStr => {
         try {
           // eslint-disable-next-line
@@ -97,7 +97,9 @@ export const usePersistReducer = (
           }
         } catch (e) {}
       });
-      AsyncStorage.setItem(config.key, JSON.stringify(whitelistState));
+      if (whitelistState) {
+        AsyncStorage.setItem(config.key, JSON.stringify(whitelistState));
+      }
     }
   }, [state, isLoadingFromStorage]);
 

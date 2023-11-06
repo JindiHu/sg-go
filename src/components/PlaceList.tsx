@@ -32,15 +32,15 @@ export const PlaceList: FC<PlaceListProps> = ({
     const [thumbnail, setThumbnail] = useState<string>();
 
     const fetchImage = async () => {
-      if (props.thumbnails.length > 0) {
+      if (props.thumbnails && props.thumbnails.length > 0) {
         if (props.thumbnails[0].url) {
           setThumbnail(props.thumbnails[0].url);
         } else if (props.thumbnails[0].uuid) {
           try {
-            const path = await tourismHubService.getMedia(
+            const base64 = await tourismHubService.getMedia(
               props.thumbnails[0].uuid,
             );
-            setThumbnail(path);
+            setThumbnail(base64);
           } catch (_) {}
         }
       }
@@ -56,17 +56,26 @@ export const PlaceList: FC<PlaceListProps> = ({
     return (
       <TouchableWithoutFeedback onPress={handlePress}>
         <View style={[styles.placeItem, {width: containerWidth}]}>
-          <View style={styles.thumbnail}>
-            <Image
-              source={{uri: thumbnail}}
-              style={[
-                {
-                  width: imageWidth,
-                  height: imageHeight,
-                  borderRadius: sizes.xs,
-                },
-              ]}
-            />
+          <View
+            style={[
+              styles.thumbnail,
+              {
+                width: imageWidth,
+                height: imageHeight,
+              },
+            ]}>
+            {thumbnail && (
+              <Image
+                source={{uri: thumbnail}}
+                style={[
+                  {
+                    width: imageWidth,
+                    height: imageHeight,
+                    borderRadius: sizes.xs,
+                  },
+                ]}
+              />
+            )}
             <View style={styles.ratingBackground}></View>
             <View style={styles.rating}>
               <Rating value={props.rating} totalStars={5} />
@@ -88,9 +97,8 @@ export const PlaceList: FC<PlaceListProps> = ({
 
   const doFetch = async () => {
     const data = await fetchData();
-
     return data.filter(place => {
-      if (place.thumbnails.length > 0) {
+      if (place.thumbnails && place.thumbnails.length > 0) {
         if (place.thumbnails[0].url || place.thumbnails[0].uuid) {
           return true;
         }

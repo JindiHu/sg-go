@@ -1,7 +1,8 @@
-import {TIH_API_KEY} from '@env';
 import axios, {AxiosInstance} from 'axios';
+import {TIH_API_KEY} from '../config/envs';
 import {urlConfig} from '../config/url';
 import {Coordinates, RoutePlanParams} from './onemap';
+import Base64 from 'base64-js';
 
 type Image = {
   uuid: string;
@@ -134,9 +135,24 @@ class TourismHubService {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64String: string | ArrayBuffer | null = reader.result;
-        if (typeof base64String === 'string') {
-          resolve(base64String);
+        if (reader.result) {
+          const base64String: string | ArrayBuffer | null = reader.result;
+          if (base64String !== null && typeof base64String === 'string') {
+            if (
+              base64String.startsWith('data:application/octet-stream;base64,')
+            ) {
+              const base64img = base64String.replace(
+                /^data:application\/octet-stream;base64,/,
+                '',
+              );
+              const imageUri = `data:image/png;base64,${base64img}`;
+              resolve(imageUri);
+            } else {
+              resolve(base64String);
+            }
+          } else {
+            reject('Conversion to base64 failed');
+          }
         } else {
           reject('Conversion to base64 failed');
         }
@@ -196,7 +212,7 @@ class TourismHubService {
       },
     );
 
-    const shops = res.data.data;
+    const shops = res.data.data ? res.data.data : [];
     return shops;
   };
 
@@ -231,7 +247,7 @@ class TourismHubService {
       },
     );
 
-    const attractions = res.data.data;
+    const attractions = res.data.data ? res.data.data : [];
     return attractions;
   };
 
@@ -256,7 +272,7 @@ class TourismHubService {
     const randomIndex = Math.floor(Math.random() * possibleSearchValues.length);
     const randomSearchValue = possibleSearchValues[randomIndex];
 
-    const res = await this.instance.get<{data: Place[]}>(
+    const res = await this.instance.get<{data?: Place[]}>(
       '/content/accommodation/v2/search',
       {
         params: {
@@ -266,8 +282,8 @@ class TourismHubService {
       },
     );
 
-    const attractions = res.data.data;
-    return attractions;
+    const accommodation = res.data.data ? res.data.data : [];
+    return accommodation;
   };
 
   public getBarsClubs = async (): Promise<Place[]> => {
@@ -305,8 +321,8 @@ class TourismHubService {
       },
     );
 
-    const attractions = res.data.data;
-    return attractions;
+    const barsClubs = res.data.data ? res.data.data : [];
+    return barsClubs;
   };
 }
 

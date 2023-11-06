@@ -54,7 +54,7 @@ export const BusArrival: FC<BusArrivalProps> = ({busStopCode, serviceNo}) => {
           busStopCode,
           serviceNo,
         );
-        if (busArrival.Services.length > 0) {
+        if (busArrival.Services && busArrival.Services.length > 0) {
           const arrival = parseInt(
             moment(busArrival.Services[0].NextBus.EstimatedArrival).format('X'),
           );

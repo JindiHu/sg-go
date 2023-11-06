@@ -16,7 +16,7 @@ export const IntermediateStops: FC<Leg> = props => {
 
   return (
     <View>
-      {props.intermediateStops.length > 0 ? (
+      {props.intermediateStops && props.intermediateStops.length > 0 ? (
         <TouchableWithoutFeedback onPress={handlePress}>
           <View style={styles.itineraryRouteLegStops}>
             {isExpanded ? (

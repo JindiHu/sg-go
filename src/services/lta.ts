@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from 'axios';
-import {LTA_ACCOUNT_KEY} from '@env';
+import {LTA_ACCOUNT_KEY} from '../config/envs';
 import {urlConfig} from '../config/url';
 
 export type NextBus = {
