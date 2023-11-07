@@ -88,7 +88,12 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
             onPress={handleOnPressOrigin}
             style={[styles.searchBar, {marginBottom: sizes.md}]}>
             {state.route.origin ? (
-              <Text style={styles.searchBarText} numberOfLines={1}>
+              <Text
+                style={[
+                  styles.searchBarText,
+                  {color: colors.dark, fontWeight: '500'},
+                ]}
+                numberOfLines={1}>
                 {state.route.origin.SEARCHVAL}
               </Text>
             ) : (
@@ -99,7 +104,12 @@ export const RouteScreen: FC<StackScreenProps<ParamList, 'Route'>> = ({
             onPress={handleOnPressDestination}
             style={styles.searchBar}>
             {state.route.destination ? (
-              <Text style={styles.searchBarText} numberOfLines={1}>
+              <Text
+                style={[
+                  styles.searchBarText,
+                  {color: colors.dark, fontWeight: '500'},
+                ]}
+                numberOfLines={1}>
                 {state.route.destination.SEARCHVAL}
               </Text>
             ) : (

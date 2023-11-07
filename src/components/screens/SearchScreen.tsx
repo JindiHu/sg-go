@@ -106,7 +106,11 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
               color={colors.gray}
               size={sizes.md}
             />
-            <Text style={[styles.rowText, {marginLeft: sizes.sm}]}>
+            <Text
+              style={[
+                styles.rowText,
+                {marginLeft: sizes.sm, marginVertical: sizes.xs},
+              ]}>
               Current location
             </Text>
           </View>
@@ -219,6 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: sizes.xxlg,
     color: colors.dark,
+    fontWeight: '500',
   },
   row: {
     flexDirection: 'row',
