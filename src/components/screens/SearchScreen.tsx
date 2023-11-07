@@ -8,6 +8,7 @@ import Geolocation from '@react-native-community/geolocation';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {FC, useState} from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   ListRenderItem,
   Platform,
@@ -71,6 +72,7 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
   };
 
   const handleOnEndEditing = async () => {
+    Keyboard.dismiss();
     if (debouncedSearchQuery) {
       setReloadKey(reloadKey + 1);
     }
@@ -161,7 +163,7 @@ export const SearchScreen: FC<StackScreenProps<ParamList, 'SearchAddress'>> = ({
             placeholder={placeholder}
             style={styles.input}
             placeholderTextColor={colors.gray}
-            autoFocus={true}
+            autoFocus={false}
             clearButtonMode={'always'}
             onChangeText={onChangeText}
             value={searchQuery}
@@ -224,6 +226,7 @@ const styles = StyleSheet.create({
     height: sizes.xxlg,
     color: colors.dark,
     fontWeight: '500',
+    fontSize: sizes.md,
   },
   row: {
     flexDirection: 'row',
